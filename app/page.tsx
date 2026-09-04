@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import HeroArt from './hero-art';
 import { DEFAULT_INTRO, findIntro, INTRO_DEFINITIONS } from './intro/registry';
 import type { IntroId } from './intro/types';
+import { HAND_DIRECTIONS } from './hand-motion';
 
 const BOOKING_URL = 'https://calendly.com/dtudor-prettypennyintelligence/introductory-meeting';
 
@@ -29,6 +30,7 @@ export default function Home() {
     const requested = query.get('intro');
     setIntroId(requested === 'original' ? 'original' : findIntro(requested)?.id ?? DEFAULT_INTRO);
     setCompare(query.get('compare') === '1');
+    if (query.get('scene') === '1') { setSkipIntro(true); setIntro(false); }
     setConfigured(true);
     return () => media.removeEventListener('change', sync);
   }, []);
@@ -36,14 +38,16 @@ export default function Home() {
     setMotionOverride(true); setSkipIntro(false); setIntro(true); setReplay(value => value + 1);
   };
   const selectIntro = (id: IntroId) => {
-    setIntroId(id); setSkipIntro(false); setIntro(true); setReplay(value => value + 1);
-    const url = new URL(window.location.href); url.searchParams.set('intro', id); url.searchParams.set('compare', '1');
+    const url = new URL(window.location.href);
+    const sceneOnly = url.searchParams.get('scene') === '1';
+    setIntroId(id); setSkipIntro(sceneOnly); setIntro(!sceneOnly); setReplay(value => value + 1);
+    url.searchParams.set('intro', id); url.searchParams.set('compare', '1');
     window.history.replaceState(null, '', url);
   };
   return <>
-    {compare && <aside className="intro-lab" aria-label="Açılış animasyonlarını karşılaştır">
-      <span className="lab-label">Açılış denemeleri</span>
-      <div className="lab-options">{INTRO_DEFINITIONS.map((item, index) => <Button key={item.id} variant="ghost" className="lab-choice" aria-pressed={introId === item.id} onClick={() => selectIntro(item.id)} title={item.description}><span className="lab-number">0{index + 1}</span>{item.shortTitle}</Button>)}</div>
+    {compare && <aside className="intro-lab" aria-label="Üç görsel yönü ve el etkileşimini karşılaştır">
+      <span className="lab-label">Görsel denemeler</span>
+      <div className="lab-options">{INTRO_DEFINITIONS.map((item, index) => <Button key={item.id} variant="ghost" className="lab-choice" aria-pressed={introId === item.id} onClick={() => selectIntro(item.id)} title={item.description + ' — ' + HAND_DIRECTIONS[item.id].name}><span className="lab-number">0{index + 1}</span>{item.shortTitle}</Button>)}</div>
       <Button variant="ghost" className="lab-replay" onClick={replayIntro} aria-label="Seçili animasyonu tekrar oynat"><RotateCcw size={15} /><span>Tekrar</span></Button>
       <a className="lab-close" href="/" aria-label="Karşılaştırmayı kapat, mevcut sürüme dön">Kapat <span aria-hidden="true">×</span></a>
     </aside>}
@@ -61,7 +65,7 @@ export default function Home() {
       <p className="eyebrow t-stagger-line t-stagger-line--1">Strategy. Risk. Possibility.</p>
       <h1 id="hero-heading"><span className="t-stagger-line t-stagger-line--2">Make every</span><em className="t-stagger-line t-stagger-line--3">penny count.</em></h1>
     </section>
-    <div className="scene-annotation" aria-hidden="true"><span />A little intelligence changes everything.</div>
+    <div className="scene-annotation" aria-hidden="true"><span />{definition ? HAND_DIRECTIONS[definition.id].hint : 'A little intelligence changes everything.'}</div>
     <section className={'hero-bottom t-stagger ' + (intro ? '' : 'is-shown')} aria-label="About Pretty Penny" inert={intro}>
       <div className="advisory-copy t-stagger-line t-stagger-line--3">
         <p className="section-label">Good thinking. Tangible value.</p>

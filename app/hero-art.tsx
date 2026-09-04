@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { createHandEffects } from './hand-effects';
+import { HAND_DIRECTIONS, materialTone } from './hand-motion';
 import type { HandSource, IntroDefinition, IntroEnvironment } from './intro/types';
 import { advanceCoinAngle, CAMERA_DISTANCE, COIN_HALF_DEPTH, projectCoin, rotateCoin, triangleTransform, visibleFace, type Point2 } from './coin-geometry';
 
@@ -35,6 +37,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
 
     const source = new Image(), logo = new Image();
     const experiment = definition?.create();
+    const handEffects = definition ? createHandEffects(definition.id) : null;
     const endTime = definition?.duration ?? 3.95;
     let introSources: HandSource[][] = [[], []];
     let width = 0, height = 0, dpr = 1, sceneY = 0, baseRadius = 0;
@@ -133,10 +136,12 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     };
 
     const buildSprites = () => {
-      sprite.width = 16 * 6; sprite.height = 16;
+      sprite.width = 16 * 6; sprite.height = 32;
       const c = sprite.getContext('2d'); if (!c) return;
       c.font = '13px ' + SYMBOL_FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#e9c48e';
       CURRENCIES.forEach((symbol, i) => c.fillText(symbol, i * 16 + 8, 8));
+      c.fillStyle = '#c6d5e2';
+      CURRENCIES.forEach((symbol, i) => c.fillText(symbol, i * 16 + 8, 24));
     };
 
     const resize = () => {
@@ -202,12 +207,13 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
             const from = ((cropY + y) * source.width + cropX + x) * 4;
             const to = (y * cropWidth + x) * 4;
             const lum = (pixels[from] * .2126 + pixels[from + 1] * .7152 + pixels[from + 2] * .0722) / 255;
-            const contour = smoothstep((lum - .055) / .15);
+            const contour = definition ? smoothstep((lum - .016) / .075) : smoothstep((lum - .055) / .15);
             const tone = Math.pow(clamp((lum - .27) / .73), 1.5);
             const level = 47 + tone * 174;
-            material.data[to] = level * 1.025;
-            material.data[to + 1] = level * 1.013;
-            material.data[to + 2] = level * .984;
+            const color = definition ? materialTone(lum, definition.id) : [level * 1.025, level * 1.013, level * .984];
+            material.data[to] = color[0];
+            material.data[to + 1] = color[1];
+            material.data[to + 2] = color[2];
             material.data[to + 3] = contour * 255;
           }
           s.putImageData(material, 0, 0);
@@ -217,7 +223,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
         glyphs.width = Math.ceil(logicalWidth * dpr); glyphs.height = Math.ceil(logicalHeight * dpr);
         const g = glyphs.getContext('2d');
         const points: HandGlyph[] = [];
-        const cellX = Math.max(3.4, artWidth / 390), cellY = cellX * 1.55;
+        const cellX = definition ? Math.max(4, artWidth / 345) : Math.max(3.4, artWidth / 390), cellY = cellX * 1.55;
         if (g) {
           g.scale(dpr, dpr); g.font = (cellY * 1.03) + 'px ' + SYMBOL_FONT;
           g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -225,11 +231,12 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
             const px = cropX + Math.floor(x / scale), py = cropY + Math.floor(y / scale);
             const i = (py * source.width + px) * 4;
             const lum = (pixels[i] * .2126 + pixels[i + 1] * .7152 + pixels[i + 2] * .0722) / 255;
-            if (lum < .2) continue;
-            const seed = seeded(px + py * 73), tone = Math.pow(clamp((lum - .27) / .73), 1.5);
+            if (lum < (definition ? .13 : .2)) continue;
+            const seed = seeded(px + py * 73), tone = definition ? Math.pow(clamp((lum - .04) / .96), 1.1) : Math.pow(clamp((lum - .27) / .73), 1.5);
             const symbol = Math.floor(seed * 6);
             // An engraved texture, not a replacement for the continuous sculpture.
-            g.fillStyle = 'rgba(43,42,37,' + (.07 + tone * .2) + ')';
+            const engraving = definition ? (.025 + tone * HAND_DIRECTIONS[definition.id].grain) : (.07 + tone * .2);
+            g.fillStyle = 'rgba(' + (definition ? '24,26,28,' : '43,42,37,') + engraving + ')';
             g.fillText(CURRENCIES[symbol], x, y);
             points.push({ x, y, symbol, tone, seed, offsetX: 0, offsetY: 0, vx: 0, vy: 0, energy: 0 });
           }
@@ -258,11 +265,12 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     const handPose = (side: number, reveal: number) => {
       const phase = elapsed * .57 + side * .72;
       const enter = 1 - out(reveal);
+      const response = handEffects?.pose(side) ?? { dx: 0, dy: 0, rotation: 0 };
       return {
         pivot: side ? width : 0,
-        dx: (Math.sin(phase) * 6 + enter * 100) * (side ? 1 : -1),
-        dy: Math.sin(phase + .65) * 4 + enter * 24,
-        rotation: (Math.sin(phase) * .016 + enter * .055) * (side ? -1 : 1),
+        dx: (Math.sin(phase) * 6 + enter * 100) * (side ? 1 : -1) + response.dx,
+        dy: Math.sin(phase + .65) * 4 + enter * 24 + response.dy,
+        rotation: (Math.sin(phase) * .016 + enter * .055) * (side ? -1 : 1) + response.rotation,
       };
     };
 
@@ -292,12 +300,20 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
         glow.addColorStop(0, 'rgba(226,172,93,.37)'); glow.addColorStop(.35, 'rgba(226,172,93,.17)'); glow.addColorStop(1, 'transparent');
         reflectionCtx.fillStyle = glow; reflectionCtx.fillRect(0, 0, width, height);
         handCtx.globalCompositeOperation = 'screen';
-        handCtx.globalAlpha = warmth;
+        handCtx.globalAlpha = warmth * (definition ? HAND_DIRECTIONS[definition.id].warmth * 1.5 : 1);
         handCtx.drawImage(handReflection, 0, 0, width, height);
         handCtx.globalAlpha = 1;
         handCtx.globalCompositeOperation = 'source-over';
       }
 
+      if (handEffects) {
+        handEffects.render({
+          ctx, material: handScene, sprite, width, height, dpr, sceneY, coinRadius: baseRadius,
+          hands, poses: hands.map(hand => handPose(hand.side, reveal)), time: elapsed, delta,
+          pointer: pointer.current, interactive: intro >= endTime, moving, reveal,
+        });
+        return;
+      }
       const active = pointer.current.active && moving && intro >= endTime;
       const field = clamp(width * .11, 72, 112);
       if (lightCtx && lightStrength > .01 && intro >= endTime) {
@@ -450,7 +466,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
       if (time - last < 1000 / 60) return;
       const delta = Math.min((time - last) / 1000, .04); last = time;
       const moving = options.current.animate;
-      if (!moving || options.current.skipIntro) { intro = Math.max(intro, endTime + 1); finish(); }
+      if (!moving || options.current.skipIntro) { intro = Math.max(intro, endTime); finish(); }
       if (moving) {
         elapsed += delta;
         if (loaded && fontsReady) intro += delta;
@@ -519,13 +535,18 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
         const glow = ctx.createRadialGradient(width / 2, coinY, 0, width / 2, coinY, glowRadius);
         glow.addColorStop(0, 'rgba(193,136,64,' + coinAlpha * (.085 + hover * .06) + ')'); glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow; ctx.fillRect(width / 2 - glowRadius, coinY - glowRadius, glowRadius * 2, glowRadius * 2);
-        drawCoin({ x: width / 2, y: coinY - hover * 8 + Math.sin(elapsed * .85) * 3 * transfer, radius: coinRadius * (1 + hover * .08), angle: shot?.angle ?? mix(-.3, angle, smoothstep((intro - 2.15) / 1)) }, coinAlpha, shot?.mint ?? 1);
+        const coinAngle = !moving && elapsed === 0 ? -.22 : shot?.angle ?? mix(-.3, angle, smoothstep((intro - 2.15) / 1));
+        drawCoin({ x: width / 2, y: coinY - hover * 8 + Math.sin(elapsed * .85) * 3 * transfer, radius: coinRadius * (1 + hover * .08), angle: coinAngle }, coinAlpha, shot?.mint ?? 1);
       }
     };
 
     source.onload = () => { if (!disposed) { loaded = true; resize(); } };
-    source.onerror = () => { intro = endTime + 1; finish(); };
-    source.src = '/hands.png';
+    let fallbackHands = false;
+    source.onerror = () => {
+      if (definition && !fallbackHands) { fallbackHands = true; source.src = '/hands.png'; return; }
+      intro = endTime + 1; finish();
+    };
+    source.src = definition ? '/hands-sculpture-v2.png' : '/hands.png';
     logo.onload = () => { if (!disposed) buildCoin(); };
     logo.src = '/pp-logo.svg';
     buildSprites(); buildCoin();
@@ -534,16 +555,16 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }); intersection.observe(canvas);
     resize(); frame = requestAnimationFrame(render);
     return () => {
-      disposed = true; cancelAnimationFrame(frame); clearTimeout(fallback);
+      disposed = true; cancelAnimationFrame(frame); clearTimeout(fallback); handEffects?.clear();
       observer.disconnect(); intersection.disconnect(); source.onload = null; source.onerror = null; logo.onload = null;
     };
   }, [definition]);
 
   return <canvas ref={canvasRef} className="hand-canvas" tabIndex={0} role="img"
-    aria-label="A rotating Pretty Penny coin floats between two sculptural hands. Explore a hand with your pointer or touch to lift a small patch of currency symbols. Arrow keys move the light; Escape releases it."
-    onPointerMove={e => { const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true, keyboard: false }; }}
-    onPointerDown={e => { const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true, keyboard: false }; }}
-    onPointerUp={e => { if (e.pointerType !== 'mouse') pointer.current.active = false; }}
+    aria-label={definition ? HAND_DIRECTIONS[definition.id].name + '. A rotating coin between two responsive sculptural hands. Explore the hand surface with your pointer, drag with one finger, or use the arrow keys. Escape releases the interaction.' : 'A rotating Pretty Penny coin floats between two sculptural hands. Explore a hand with your pointer or touch to lift currency symbols. Arrow keys move the light; Escape releases it.'}
+    onPointerMove={e => { if (!e.isPrimary) return; const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true, keyboard: false }; }}
+    onPointerDown={e => { if (!e.isPrimary) return; const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true, keyboard: false }; }}
+    onPointerUp={e => { if (e.isPrimary && e.pointerType !== 'mouse') pointer.current.active = false; }}
     onPointerLeave={() => { pointer.current.active = false; }}
     onPointerCancel={() => { pointer.current.active = false; }}
     onBlur={() => { pointer.current.active = false; }}
@@ -551,7 +572,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
       if (e.key === 'Escape') { pointer.current.active = false; return; }
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
       e.preventDefault(); const box = e.currentTarget.getBoundingClientRect();
-      if (!pointer.current.active) pointer.current = { x: box.width / 2, y: box.height * .55, active: true, keyboard: true };
+      if (!pointer.current.active) pointer.current = { x: box.width * .3, y: box.height * .55, active: true, keyboard: true };
       pointer.current.keyboard = true;
       pointer.current.x = clamp(pointer.current.x + (e.key === 'ArrowRight' ? 30 : e.key === 'ArrowLeft' ? -30 : 0), 0, box.width);
       pointer.current.y = clamp(pointer.current.y + (e.key === 'ArrowDown' ? 30 : e.key === 'ArrowUp' ? -30 : 0), 0, box.height);
