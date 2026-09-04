@@ -2,7 +2,7 @@
 
 Branch: `intro/orbit-mint`. Root opens this concept; `?intro=original` keeps the original available.
 
-The original hero composition, copy, hand material, local hover spring and true 3D eight-second coin loop are shared, not redesigned.
+The original hero composition, copy and true 3D eight-second coin loop are shared. The second exploration pairs this opening with cool satin-silver hands and a larger, depth-layered orbital material lift; see `hand-art-direction.md`.
 
 ## Choreography
 
