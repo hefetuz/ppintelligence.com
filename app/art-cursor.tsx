@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { assetUrl } from './asset-url';
 
 /** Native pointer coordinates are the artwork's fingertip, not its centre. */
 export default function ArtCursor() {
@@ -12,7 +13,7 @@ export default function ArtCursor() {
     let ready = false;
     const image = new Image();
     image.onload = () => { ready = true; };
-    image.src = '/cursor.png';
+    image.src = assetUrl('cursor.png');
     const hide = () => {
       cursor.dataset.visible = 'false';
       cursor.dataset.pressed = 'false';
@@ -48,5 +49,5 @@ export default function ArtCursor() {
       fine.removeEventListener('change', hide);
     };
   }, []);
-  return <div ref={ref} className="art-cursor" aria-hidden="true"><img src="/cursor.png" alt="" width={339} height={538} draggable={false} /></div>;
+  return <div ref={ref} className="art-cursor" aria-hidden="true"><img src={assetUrl('cursor.png')} alt="" width={339} height={538} draggable={false} /></div>;
 }

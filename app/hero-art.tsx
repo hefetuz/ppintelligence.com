@@ -6,6 +6,7 @@ import { HAND_DIRECTIONS, materialTone } from './hand-motion';
 import type { HandSource, IntroDefinition, IntroEnvironment } from './intro/types';
 import { CAMERA_DISTANCE, COIN_HALF_DEPTH, projectCoin, rotateCoin, triangleTransform, visibleFace, type Point2 } from './coin-geometry';
 import { spinAngle } from './intro/motion';
+import { assetUrl } from './asset-url';
 
 const CURRENCIES = ['$', '€', '£', '¥', '₺', '₹'];
 const SYMBOL_FONT = 'Consolas, "Segoe UI Symbol", monospace';
@@ -577,12 +578,12 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     source.onload = () => { if (!disposed) { loaded = true; resize(); } };
     let fallbackHands = false;
     source.onerror = () => {
-      if (definition && !fallbackHands) { fallbackHands = true; source.src = '/hands.png'; return; }
+      if (definition && !fallbackHands) { fallbackHands = true; source.src = assetUrl('hands.png'); return; }
       intro = endTime + 1; finish();
     };
-    source.src = definition ? '/hands-sculpture-v2.png' : '/hands.png';
+    source.src = assetUrl(definition ? 'hands-sculpture-v2.png' : 'hands.png');
     logo.onload = () => { if (!disposed) buildCoin(); };
-    logo.src = '/pp-logo.svg';
+    logo.src = assetUrl('pp-logo.svg');
     buildSprites(); buildCoin();
     document.fonts.ready.then(() => { if (!disposed) { fontsReady = true; resize(); } });
     const observer = new ResizeObserver(resize); observer.observe(canvas);
