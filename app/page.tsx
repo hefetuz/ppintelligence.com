@@ -8,6 +8,7 @@ import { DEFAULT_INTRO, findIntro, INTRO_DEFINITIONS } from './intro/registry';
 import type { IntroId } from './intro/types';
 import { HAND_DIRECTIONS } from './hand-motion';
 import ArtCursor from './art-cursor';
+import { assetUrl } from './asset-url';
 
 const BOOKING_URL = 'https://calendly.com/dtudor-prettypennyintelligence/introductory-meeting';
 
@@ -55,13 +56,13 @@ export default function Home() {
       <span className="lab-label">Pretty Penny <span>Art direction / 03</span></span>
       <div className="lab-options">{INTRO_DEFINITIONS.map((item, index) => <Button key={item.id} variant="ghost" className="lab-choice" aria-pressed={introId === item.id} onClick={() => selectIntro(item.id)} title={item.description + ' — ' + HAND_DIRECTIONS[item.id].name}><span className="lab-number">0{index + 1}</span>{item.shortTitle}</Button>)}</div>
       <Button variant="ghost" className="lab-replay" onClick={replayIntro} aria-label="Seçili animasyonu tekrar oynat"><RotateCcw size={15} /><span>Tekrar</span></Button>
-      <a className="lab-close" href="/" aria-label="Karşılaştırmayı kapat, mevcut sürüme dön">Kapat <span aria-hidden="true">×</span></a>
+      <a className="lab-close" href={assetUrl('')} aria-label="Karşılaştırmayı kapat, mevcut sürüme dön">Kapat <span aria-hidden="true">×</span></a>
     </aside>}
     <main data-direction={introId} className={'hero ' + (intro ? 'intro-running' : 'scene-ready') + (animate ? '' : ' motion-paused')}>
     <div className="artwork">{configured && <HeroArt key={introId + replay} animate={animate} skipIntro={skipIntro} onIntroComplete={finishIntro} definition={definition} />}</div>
     <header className="hero-header">
-      <a className="identity" href="/" aria-label="Pretty Penny Intelligence home">
-        <img className="pp-mark" src="/pp-logo.svg" alt="" width={44} height={44} />
+      <a className="identity" href={assetUrl('')} aria-label="Pretty Penny Intelligence home">
+        <img className="pp-mark" src={assetUrl('pp-logo.svg')} alt="" width={44} height={44} />
         <span className="wordmark">Pretty Penny<span>Intelligence</span></span>
       </a>
       <span className="header-descriptor">Independent minds. Lasting impact.</span>
