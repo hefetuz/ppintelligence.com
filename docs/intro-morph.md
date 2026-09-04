@@ -13,4 +13,4 @@ One continuous metallic letterform: dollar → euro → pound → three concentr
 - 3.05–3.71s: the coin surface and PP seal finish forming.
 - 3.6–4.75s: the same coin moves into the existing hand composition.
 
-Shared hero, hand hover, accessibility and monotonic coin rotation are preserved. This version intentionally spends its motion budget on the silhouette, without orbiting satellites or turbulence.
+Shared hero, accessibility and monotonic coin rotation are preserved. The second exploration pairs this opening with a new platinum sculpture and continuous texture refraction under a broad studio-light reflection. No orbiting particles; see `hand-art-direction.md`.

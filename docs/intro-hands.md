@@ -12,4 +12,4 @@ The real hand silhouettes are present from the first moment. Currency material c
 - 2.02–3.37s: the surface closes, followed by the PP seal; warmth grows on the hands.
 - 3.25–4.5s: the minted coin settles to its final size. It never changes vertical position.
 
-The original local hand-hover spring takes over after the intro; the anatomy, English hero copy, CTA and coin loop are preserved. The motion differentiates human insight from a generic finance/crypto particle loader.
+The second exploration pairs this opening with a warm alabaster sculpture and living currency engraving: directional lifted bands, fine connecting threads and a small inward reach from the touched hand. The English hero copy, CTA and coin loop are preserved. See `hand-art-direction.md`.
