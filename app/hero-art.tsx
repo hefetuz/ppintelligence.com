@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { advanceCoinAngle, CAMERA_DISTANCE, COIN_HALF_DEPTH, projectCoin, rotateCoin, triangleTransform, visibleFace, type Point2 } from './coin-geometry';
 
 const CURRENCIES = ['$', '€', '£', '¥', '₺', '₹'];
 const SYMBOL_FONT = 'Consolas, "Segoe UI Symbol", monospace';
@@ -14,7 +15,9 @@ const seeded = (n: number) => { const v = Math.sin(n * 127.1 + 311.7) * 43758.54
 type Props = { animate: boolean; skipIntro: boolean; onIntroComplete: () => void };
 type Particle = { x: number; y: number; group: number; seed: number; tx: number; ty: number };
 type Anchor = { x: number; y: number; size: number; rotation: number };
-type HandLayer = { image: HTMLCanvasElement; side: number };
+type HandGlyph = { x: number; y: number; symbol: number; tone: number; seed: number; offsetX: number; offsetY: number; vx: number; vy: number; energy: number };
+type HandLayer = { image: HTMLCanvasElement; glyphs: HTMLCanvasElement; points: HandGlyph[]; side: number; x: number; y: number; width: number; height: number };
+type CoinSurface = { points: Point2[]; depth: number; texture?: HTMLCanvasElement; uv?: Point2[]; fill?: string; shade?: number };
 type CoinPose = { x: number; y: number; radius: number; angle: number };
 
 export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) {
@@ -35,12 +38,15 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
     let loaded = false, fontsReady = false, disposed = false, announced = false, visible = true;
     let hover = 0, lightX = 0, lightY = 0, lightStrength = 0;
     let anchors: Anchor[] = [], particles: Particle[] = [], hands: HandLayer[] = [];
-    const overscan = 160;
     const face = document.createElement('canvas');
-    const edge = document.createElement('canvas');
+    const reverse = document.createElement('canvas');
     const sprite = document.createElement('canvas');
     const spotlight = document.createElement('canvas');
     const lightCtx = spotlight.getContext('2d');
+    const handScene = document.createElement('canvas');
+    const handCtx = handScene.getContext('2d');
+    const handReflection = document.createElement('canvas');
+    const reflectionCtx = handReflection.getContext('2d');
     let faceReady = false;
 
     const finish = () => {
@@ -93,13 +99,25 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
         c.save(); c.translate(cx + Math.cos(a) * 252, cy + Math.sin(a) * 252); c.rotate(a + Math.PI / 2);
         c.fillText(inscription[i], 0, 0); c.restore();
       }
-      edge.width = 72; edge.height = 640;
-      const e = edge.getContext('2d');
-      if (e) {
-        const g = e.createLinearGradient(0, 0, 0, 640);
-        g.addColorStop(0, '#eac38a'); g.addColorStop(.2, '#a3703f'); g.addColorStop(.5, '#f6d69e'); g.addColorStop(.8, '#80542e'); g.addColorStop(1, '#d8aa72');
-        e.fillStyle = g; e.fillRect(0, 0, 72, 640);
-        e.fillStyle = '#35231165'; for (let y = 0; y < 640; y += 9) e.fillRect(0, y, 72, 2);
+      // A distinct reverse gives an unmistakable front -> edge -> back -> edge cycle.
+      reverse.width = reverse.height = 640;
+      const back = reverse.getContext('2d');
+      if (back) {
+        back.drawImage(face, 0, 0);
+        const satin = back.createLinearGradient(80, 100, 540, 540);
+        satin.addColorStop(0, '#d9b781'); satin.addColorStop(.5, '#ae7f4c'); satin.addColorStop(1, '#ddba80');
+        back.fillStyle = satin; back.beginPath(); back.arc(320, 320, 237, 0, Math.PI * 2); back.fill();
+        back.textAlign = 'center'; back.textBaseline = 'middle';
+        back.fillStyle = '#644321'; back.font = '51px Georgia, serif';
+        back.fillText('PRETTY', 320, 283); back.fillText('PENNY', 320, 343);
+        back.font = '17px ' + SYMBOL_FONT; back.fillText('INTELLIGENCE', 320, 397);
+        back.fillStyle = 'rgba(255,234,197,.85)'; back.font = '51px Georgia, serif';
+        back.fillText('PRETTY', 318, 281); back.fillText('PENNY', 318, 341);
+        back.font = '19px ' + SYMBOL_FONT;
+        CURRENCIES.forEach((symbol, i) => {
+          const a = i / 6 * Math.PI * 2 - Math.PI / 2;
+          back.fillText(symbol, 320 + Math.cos(a) * 196, 320 + Math.sin(a) * 196);
+        });
       }
       faceReady = true;
     };
@@ -118,7 +136,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       dpr = Math.min(window.devicePixelRatio || 1, 1.75);
       canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      spotlight.width = canvas.width; spotlight.height = canvas.height;
+      for (const layer of [spotlight, handScene, handReflection]) { layer.width = canvas.width; layer.height = canvas.height; }
       const hero = canvas.closest('main');
       const titleBottom = hero?.querySelector('.hero-title')?.getBoundingClientRect().bottom;
       const contentTop = hero?.querySelector('.hero-bottom')?.getBoundingClientRect().top;
@@ -150,78 +168,231 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       }
       if (!loaded) return;
       const artWidth = width < 760 ? width * 1.65 : Math.min(width * 1.13, (stageBottom - stageTop) * 4.5);
-      const cellX = Math.max(2.5, artWidth / 470), cellY = cellX * 1.44;
-      const sample = document.createElement('canvas');
-      sample.width = Math.round(artWidth / cellX);
-      sample.height = Math.round(artWidth * source.height / source.width / cellY);
-      const c = sample.getContext('2d', { willReadFrequently: true });
-      if (!c) return;
-      c.drawImage(source, 0, 0, sample.width, sample.height);
-      const pixels = c.getImageData(0, 0, sample.width, sample.height).data;
       const left = (width - artWidth) / 2 + artWidth * .023;
       const top = sceneY - artWidth * source.height / source.width * .532;
-      const clearance = baseRadius * 1.23;
+      const scale = artWidth / source.width;
+      const clearance = baseRadius * 1.24;
+      const original = document.createElement('canvas');
+      original.width = source.width; original.height = source.height;
+      const originalCtx = original.getContext('2d', { willReadFrequently: true });
+      if (!originalCtx) return;
+      originalCtx.drawImage(source, 0, 0);
+      const pixels = originalCtx.getImageData(0, 0, source.width, source.height).data;
+      const cropY = Math.floor(source.height * .325);
+      const cropHeight = Math.ceil(source.height * .43);
+      const split = Math.floor(source.width * .477);
       hands = [0, 1].map(side => {
-        const layer = document.createElement('canvas');
-        layer.width = Math.round((width + overscan * 2) * dpr);
-        layer.height = Math.round((height + overscan * 2) * dpr);
-        const l = layer.getContext('2d');
-        if (l) {
-          l.scale(dpr, dpr); l.translate(overscan, overscan);
-          l.font = (cellY * 1.1) + 'px ' + SYMBOL_FONT; l.textAlign = 'center'; l.textBaseline = 'middle';
-          for (let y = 0; y < sample.height; y++) for (let x = 0; x < sample.width; x++) {
-            const handSide = x < sample.width * .477 ? 0 : 1;
-            if (handSide !== side) continue;
-            const i = (y * sample.width + x) * 4;
+        const cropX = side ? split : 0, cropWidth = side ? source.width - split : split;
+        const sculpture = document.createElement('canvas');
+        sculpture.width = cropWidth; sculpture.height = cropHeight;
+        const s = sculpture.getContext('2d');
+        if (s) {
+          const material = s.createImageData(cropWidth, cropHeight);
+          for (let y = 0; y < cropHeight; y++) for (let x = 0; x < cropWidth; x++) {
+            const from = ((cropY + y) * source.width + cropX + x) * 4;
+            const to = (y * cropWidth + x) * 4;
+            const lum = (pixels[from] * .2126 + pixels[from + 1] * .7152 + pixels[from + 2] * .0722) / 255;
+            const contour = smoothstep((lum - .055) / .15);
+            const tone = Math.pow(clamp((lum - .27) / .73), 1.5);
+            const level = 47 + tone * 174;
+            material.data[to] = level * 1.025;
+            material.data[to + 1] = level * 1.013;
+            material.data[to + 2] = level * .984;
+            material.data[to + 3] = contour * 255;
+          }
+          s.putImageData(material, 0, 0);
+        }
+        const logicalWidth = cropWidth * scale, logicalHeight = cropHeight * scale;
+        const glyphs = document.createElement('canvas');
+        glyphs.width = Math.ceil(logicalWidth * dpr); glyphs.height = Math.ceil(logicalHeight * dpr);
+        const g = glyphs.getContext('2d');
+        const points: HandGlyph[] = [];
+        const cellX = Math.max(3.4, artWidth / 390), cellY = cellX * 1.55;
+        if (g) {
+          g.scale(dpr, dpr); g.font = (cellY * 1.03) + 'px ' + SYMBOL_FONT;
+          g.textAlign = 'center'; g.textBaseline = 'middle';
+          for (let y = cellY / 2; y < logicalHeight; y += cellY) for (let x = cellX / 2; x < logicalWidth; x += cellX) {
+            const px = cropX + Math.floor(x / scale), py = cropY + Math.floor(y / scale);
+            const i = (py * source.width + px) * 4;
             const lum = (pixels[i] * .2126 + pixels[i + 1] * .7152 + pixels[i + 2] * .0722) / 255;
-            if (lum < .14) continue;
-            const tone = Math.pow(clamp((lum - .35) / .65), 1.55);
-            const px = left + x * cellX + (side ? clearance : -clearance), py = top + y * cellY;
-            // Low continuous ink preserves the hand silhouette; currency engraving provides its texture.
-            l.fillStyle = 'rgba(224,223,213,' + tone * .12 + ')'; l.fillRect(px - cellX / 2, py - cellY / 2, cellX, cellY);
-            l.fillStyle = 'rgba(229,231,226,' + (.08 + tone * .77) + ')';
-            l.fillText(CURRENCIES[Math.floor(seeded(x + y * 73) * 6)], px, py);
+            if (lum < .2) continue;
+            const seed = seeded(px + py * 73), tone = Math.pow(clamp((lum - .27) / .73), 1.5);
+            const symbol = Math.floor(seed * 6);
+            // An engraved texture, not a replacement for the continuous sculpture.
+            g.fillStyle = 'rgba(43,42,37,' + (.07 + tone * .2) + ')';
+            g.fillText(CURRENCIES[symbol], x, y);
+            points.push({ x, y, symbol, tone, seed, offsetX: 0, offsetY: 0, vx: 0, vy: 0, energy: 0 });
           }
         }
-        return { image: layer, side };
+        return { image: sculpture, glyphs, points, side, x: left + cropX * scale + (side ? clearance : -clearance), y: top + cropY * scale, width: logicalWidth, height: logicalHeight };
       });
     };
 
-    const drawHands = (target: CanvasRenderingContext2D, reveal: number) => {
-      for (const { image, side } of hands) {
-        const phase = elapsed * .62 + side * .7;
-        const pivot = side ? width : 0;
-        const enter = 1 - out(reveal);
-        const dx = (Math.sin(phase) * 8 + enter * 100) * (side ? 1 : -1);
-        const dy = Math.sin(phase + .65) * 6 + enter * 24;
-        const rotation = (Math.sin(phase) * .025 + enter * .055) * (side ? -1 : 1);
-        target.save(); target.globalAlpha = smoothstep(reveal);
-        target.translate(pivot + dx, sceneY + dy); target.rotate(rotation); target.translate(-pivot, -sceneY);
-        target.drawImage(image, -overscan, -overscan, width + overscan * 2, height + overscan * 2);
-        target.restore();
+    const handPose = (side: number, reveal: number) => {
+      const phase = elapsed * .57 + side * .72;
+      const enter = 1 - out(reveal);
+      return {
+        pivot: side ? width : 0,
+        dx: (Math.sin(phase) * 6 + enter * 100) * (side ? 1 : -1),
+        dy: Math.sin(phase + .65) * 4 + enter * 24,
+        rotation: (Math.sin(phase) * .016 + enter * .055) * (side ? -1 : 1),
+      };
+    };
+
+    const drawHands = (reveal: number, delta: number, moving: boolean) => {
+      if (!handCtx) return;
+      handCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      handCtx.clearRect(0, 0, width, height);
+      handCtx.globalCompositeOperation = 'source-over';
+      for (const hand of hands) {
+        const pose = handPose(hand.side, reveal);
+        handCtx.save(); handCtx.globalAlpha = smoothstep(reveal);
+        handCtx.translate(pose.pivot + pose.dx, sceneY + pose.dy);
+        handCtx.rotate(pose.rotation); handCtx.translate(-pose.pivot, -sceneY);
+        handCtx.drawImage(hand.image, hand.x, hand.y, hand.width, hand.height);
+        handCtx.drawImage(hand.glyphs, hand.x, hand.y, hand.width, hand.height);
+        handCtx.restore();
       }
+
+      // The coin's warm light is clipped to the actual hand silhouette.
+      if (reflectionCtx) {
+        reflectionCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        reflectionCtx.clearRect(0, 0, width, height);
+        reflectionCtx.globalCompositeOperation = 'source-over';
+        reflectionCtx.drawImage(handScene, 0, 0, width, height);
+        reflectionCtx.globalCompositeOperation = 'source-in';
+        const glow = reflectionCtx.createRadialGradient(width / 2, sceneY, baseRadius * .5, width / 2, sceneY, baseRadius * 4.2);
+        glow.addColorStop(0, 'rgba(226,172,93,.37)'); glow.addColorStop(.35, 'rgba(226,172,93,.17)'); glow.addColorStop(1, 'transparent');
+        reflectionCtx.fillStyle = glow; reflectionCtx.fillRect(0, 0, width, height);
+        handCtx.globalCompositeOperation = 'screen';
+        handCtx.drawImage(handReflection, 0, 0, width, height);
+        handCtx.globalCompositeOperation = 'source-over';
+      }
+
+      const active = pointer.current.active && moving && intro > 3.9;
+      const field = clamp(width * .11, 72, 112);
+      if (lightCtx && lightStrength > .01 && intro > 3.9) {
+        lightCtx.setTransform(dpr, 0, 0, dpr, 0, 0); lightCtx.clearRect(0, 0, width, height);
+        lightCtx.globalCompositeOperation = 'source-over'; lightCtx.drawImage(handScene, 0, 0, width, height);
+        lightCtx.globalCompositeOperation = 'source-in';
+        const light = lightCtx.createRadialGradient(lightX, lightY, 0, lightX, lightY, field * 1.5);
+        light.addColorStop(0, 'rgba(239,220,188,' + lightStrength * .14 + ')'); light.addColorStop(1, 'transparent');
+        lightCtx.fillStyle = light; lightCtx.fillRect(0, 0, width, height);
+        handCtx.globalCompositeOperation = 'screen'; handCtx.drawImage(spotlight, 0, 0, width, height);
+        handCtx.globalCompositeOperation = 'source-over';
+      }
+
+      // Lift only a local patch of the material. The surrounding anatomy never disappears.
+      if (moving && intro > 3.9 && lightStrength > .01) {
+        handCtx.globalCompositeOperation = 'destination-out';
+        const hole = handCtx.createRadialGradient(lightX, lightY, 0, lightX, lightY, field);
+        hole.addColorStop(0, 'rgba(0,0,0,' + lightStrength * .68 + ')');
+        hole.addColorStop(.35, 'rgba(0,0,0,' + lightStrength * .38 + ')'); hole.addColorStop(1, 'transparent');
+        handCtx.fillStyle = hole; handCtx.fillRect(lightX - field, lightY - field, field * 2, field * 2);
+        handCtx.globalCompositeOperation = 'source-over';
+      }
+      ctx.drawImage(handScene, 0, 0, width, height);
+
+      for (const hand of hands) {
+        const pose = handPose(hand.side, reveal), c = Math.cos(pose.rotation), s = Math.sin(pose.rotation);
+        for (const p of hand.points) {
+          const localX = hand.x + p.x - pose.pivot, localY = hand.y + p.y - sceneY;
+          const x = pose.pivot + pose.dx + localX * c - localY * s;
+          const y = sceneY + pose.dy + localX * s + localY * c;
+          const dx = x - lightX, dy = y - lightY;
+          const distance = Math.hypot(dx, dy);
+          const weight = active ? Math.pow(clamp(1 - distance / field), 2) : 0;
+          if (weight < .001 && p.energy < .002 && Math.abs(p.offsetX) + Math.abs(p.offsetY) < .05) continue;
+          if (moving) {
+            const influence = 1 - Math.exp(-delta * (weight > p.energy ? 12 : 7));
+            p.energy += (weight - p.energy) * influence;
+            // A short tangential arc and a soft return, not an unbounded vortex.
+            const nx = dx / Math.max(8, distance), ny = dy / Math.max(8, distance);
+            const targetX = (nx * 19 - ny * 12 + Math.sin(elapsed * 1.7 + p.seed * 6) * 3) * weight;
+            const targetY = (ny * 19 + nx * 12 - 11) * weight;
+            const steps = Math.max(1, Math.ceil(delta / .016));
+            const dt = delta / steps;
+            for (let i = 0; i < steps; i++) {
+              p.vx += ((targetX - p.offsetX) * 125 - p.vx * 21) * dt;
+              p.vy += ((targetY - p.offsetY) * 125 - p.vy * 21) * dt;
+              p.offsetX += p.vx * dt; p.offsetY += p.vy * dt;
+            }
+          }
+          const size = 5 + p.energy * 3;
+          ctx.globalAlpha = clamp(p.energy * 1.65) * (.48 + p.tone * .52) * smoothstep(reveal);
+          ctx.drawImage(sprite, p.symbol * 16, 0, 16, 16, x + p.offsetX - size / 2, y + p.offsetY - size / 2, size, size);
+        }
+      }
+      ctx.globalAlpha = 1;
     };
 
     const drawCoin = (pose: CoinPose, alpha: number) => {
       if (!faceReady || alpha <= 0) return;
-      const cos = Math.cos(pose.angle), sin = Math.sin(pose.angle), squash = Math.max(.014, Math.abs(cos));
-      ctx.save(); ctx.globalAlpha = alpha; ctx.translate(pose.x, pose.y);
-      ctx.rotate(-.12 + hover * .12);
-      const thick = pose.radius * .19 * sin;
-      // Extrusion and reeding stay visible as the same coin turns edge-on.
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(0, 0, Math.abs(thick) + pose.radius * squash, pose.radius, 0, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(edge, -Math.abs(thick) - pose.radius * squash, -pose.radius, (Math.abs(thick) + pose.radius * squash) * 2, pose.radius * 2);
-      ctx.restore();
-      ctx.translate(thick, 0); ctx.scale(squash, 1);
-      ctx.drawImage(face, -pose.radius * 1.067, -pose.radius * 1.067, pose.radius * 2.134, pose.radius * 2.134);
-      const shade = ctx.createLinearGradient(-pose.radius, 0, pose.radius, 0);
-      shade.addColorStop(0, 'rgba(255,246,220,' + (.07 + Math.max(0, sin) * .2) + ')');
-      shade.addColorStop(.5, 'rgba(255,240,213,.02)');
-      shade.addColorStop(1, 'rgba(19,11,4,' + Math.abs(sin) * .38 + ')');
-      ctx.fillStyle = shade; ctx.beginPath(); ctx.arc(0, 0, pose.radius, 0, Math.PI * 2); ctx.fill();
+      const tilt = .17 + hover * .04;
+      const center = { x: pose.x, y: pose.y };
+      const surfaces: CoinSurface[] = [];
+      const segments = 64;
+      const project = (x: number, y: number, z: number) => {
+        const rotated = rotateCoin({ x, y, z }, pose.angle, tilt);
+        return { world: rotated, screen: projectCoin(rotated, pose.radius, center) };
+      };
+      for (let i = 0; i < segments; i++) {
+        const a = i / segments * Math.PI * 2, b = (i + 1) / segments * Math.PI * 2, mid = (a + b) / 2;
+        const normal = rotateCoin({ x: Math.cos(mid), y: Math.sin(mid), z: 0 }, pose.angle, tilt);
+        if (normal.z * CAMERA_DISTANCE <= 1) continue;
+        const vertices = [
+          project(Math.cos(a), Math.sin(a), -COIN_HALF_DEPTH),
+          project(Math.cos(b), Math.sin(b), -COIN_HALF_DEPTH),
+          project(Math.cos(b), Math.sin(b), COIN_HALF_DEPTH),
+          project(Math.cos(a), Math.sin(a), COIN_HALF_DEPTH),
+        ];
+        const lit = clamp(normal.x * -.45 + normal.y * -.5 + normal.z * .74);
+        const reed = i % 2 ? .84 : 1;
+        const r = Math.round((114 + lit * 112) * reed), g = Math.round((72 + lit * 107) * reed), blue = Math.round((35 + lit * 80) * reed);
+        surfaces.push({ points: vertices.map(v => v.screen), depth: vertices.reduce((sum, v) => sum + v.world.z, 0) / 4, fill: 'rgb(' + r + ',' + g + ',' + blue + ')' });
+      }
+      for (const side of [1, -1]) {
+        if (!visibleFace(side, pose.angle, tilt)) continue;
+        const normal = rotateCoin({ x: 0, y: 0, z: side }, pose.angle, tilt);
+        const light = clamp(normal.x * -.4 + normal.y * -.45 + normal.z * .8);
+        const centerVertex = project(0, 0, side * COIN_HALF_DEPTH);
+        for (let i = 0; i < segments; i++) {
+          const a = i / segments * Math.PI * 2, b = (i + 1) / segments * Math.PI * 2;
+          const vertices = [centerVertex, project(Math.cos(a) * side, Math.sin(a), side * COIN_HALF_DEPTH), project(Math.cos(b) * side, Math.sin(b), side * COIN_HALF_DEPTH)];
+          surfaces.push({
+            points: vertices.map(v => v.screen),
+            depth: vertices.reduce((sum, v) => sum + v.world.z, 0) / 3,
+            texture: side === 1 ? face : reverse,
+            uv: [{ x: 320, y: 320 }, { x: 320 + Math.cos(a) * 300, y: 320 + Math.sin(a) * 300 }, { x: 320 + Math.cos(b) * 300, y: 320 + Math.sin(b) * 300 }],
+            shade: (1 - light) * .3,
+          });
+        }
+      }
+      surfaces.sort((a, b) => a.depth - b.depth);
+      ctx.save(); ctx.globalAlpha = alpha;
+      for (const surface of surfaces) {
+        const points = surface.points;
+        const mid = { x: points.reduce((n, p) => n + p.x, 0) / points.length, y: points.reduce((n, p) => n + p.y, 0) / points.length };
+        const path = () => {
+          ctx.beginPath();
+          points.forEach((p, i) => {
+            // A subpixel overlap removes antialiasing cracks between adjacent mesh triangles.
+            const d = Math.hypot(p.x - mid.x, p.y - mid.y) || 1;
+            const x = p.x + (p.x - mid.x) / d * .22, y = p.y + (p.y - mid.y) / d * .22;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          });
+          ctx.closePath();
+        };
+        if (surface.texture && surface.uv) {
+          const matrix = triangleTransform(surface.uv, points);
+          if (!matrix) continue;
+          ctx.save(); path(); ctx.clip(); ctx.transform(...matrix);
+          ctx.drawImage(surface.texture, 0, 0); ctx.restore();
+          path(); ctx.fillStyle = 'rgba(27,17,8,' + surface.shade + ')'; ctx.fill();
+        } else {
+          path(); ctx.fillStyle = surface.fill || '#b78a4d'; ctx.fill();
+        }
+      }
       ctx.restore();
     };
 
@@ -236,7 +407,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       if (moving) {
         elapsed += delta;
         if (loaded && fontsReady) intro += delta;
-        angle += delta * Math.PI * 2 / 8 * (1 + hover * .42);
+        angle = advanceCoinAngle(angle, delta);
       }
       if (intro >= 3.45) finish();
       ctx.fillStyle = INK; ctx.fillRect(0, 0, width, height);
@@ -291,17 +462,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
         }
       }
 
-      if (revealHands > 0) drawHands(ctx, revealHands);
-      if (lightCtx && lightStrength > .01 && intro > 3.45) {
-        lightCtx.setTransform(dpr, 0, 0, dpr, 0, 0); lightCtx.clearRect(0, 0, width, height);
-        lightCtx.globalCompositeOperation = 'source-over'; drawHands(lightCtx, revealHands);
-        lightCtx.globalCompositeOperation = 'destination-in';
-        const r = Math.min(width * .25, 230);
-        const g = lightCtx.createRadialGradient(lightX, lightY, 0, lightX, lightY, r);
-        g.addColorStop(0, 'rgba(255,255,255,' + lightStrength * .6 + ')'); g.addColorStop(1, 'transparent');
-        lightCtx.fillStyle = g; lightCtx.fillRect(0, 0, width, height);
-        ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.drawImage(spotlight, 0, 0, width, height); ctx.restore();
-      }
+      if (revealHands > 0) drawHands(revealHands, delta, moving);
       // A quiet halo is local to the focal object, never a full-page decorative wash.
       if (coinAlpha > 0) {
         const glowRadius = coinRadius * (2 + hover * .4);
@@ -329,9 +490,10 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
   }, []);
 
   return <canvas ref={canvasRef} className="hand-canvas" tabIndex={0} role="img"
-    aria-label="Currency symbols gather into a Pretty Penny coin, held between two gently moving hands made from currency symbols. Move the pointer, touch, or use arrow keys to explore."
+    aria-label="A rotating Pretty Penny coin floats between two sculptural hands. Explore a hand with your pointer or touch to lift a small patch of currency symbols. Arrow keys move the light; Escape releases it."
     onPointerMove={e => { const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true, keyboard: false }; }}
     onPointerDown={e => { const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true, keyboard: false }; }}
+    onPointerUp={e => { if (e.pointerType !== 'mouse') pointer.current.active = false; }}
     onPointerLeave={() => { pointer.current.active = false; }}
     onPointerCancel={() => { pointer.current.active = false; }}
     onBlur={() => { pointer.current.active = false; }}

@@ -23,7 +23,9 @@ The introduction is a short brand sequence, not a fabricated loading percentage.
 3. 2.5–3.8s: that same coin travels to its resting place; the two hands arrive from the sides.
 4. 3.45s: editorial copy and actions reveal with a 40ms stagger, 12px rise and 3px blur over 500ms.
 
-Idle hands use wrist-pivot transforms. The coin rotates every eight seconds; hover adds an 8px lift, 8% scale and a restrained speed increase. Intro skip, replay, pause, touch, keyboard and reduced-motion behavior are preserved. Offscreen/hidden rendering pauses. Font/image failure cannot block access to the page.
+Idle hands use restrained wrist-pivot transforms. The supplied full-resolution image now provides the continuous sculptural surface, with currency engraving as a secondary layer. Local pointer exploration lifts a patch of currency symbols within a 72–112px field using a damped spring (stiffness 125, damping 21). Only that small patch partially dissolves; the hand's overall anatomy stays intact. Touch release lets it return. Coin-tinted light is clipped to the fingers.
+
+The coin uses signed 3D vertex rotation, perspective projection, back-face culling, a reeded cylinder edge and separate front/reverse textures. It turns continuously every eight seconds at constant speed; hover adds an 8px lift and 8% scale without changing rotational direction or speed. Five geometry tests check monotonic rotation, exact loop closure, face selection, perspective and texture mapping. Intro skip, replay, pause, touch, keyboard and reduced-motion behavior are preserved. Offscreen/hidden rendering pauses. Font/image failure cannot block access to the page.
 
 ## References
 
