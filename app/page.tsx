@@ -3,6 +3,29 @@
 import { useEffect, useRef, useState } from 'react';
 
 type Point = { x: number; y: number; light: number; seed: number; glyph: string };
+type CoinPoint = { x: number; y: number; z: number; nx: number; nz: number; rim: boolean; engraving: boolean };
+
+// A shallow cylinder with two engraved faces and a reeded edge.
+function makeCoin(): CoinPoint[] {
+  const result: CoinPoint[] = [];
+  for (const side of [-1, 1]) {
+    for (let y = -.98; y <= .98; y += .047) {
+      for (let x = -.98; x <= .98; x += .047) {
+        const radius = Math.hypot(x, y);
+        if (radius > 1) continue;
+        const ring = Math.abs(radius - .82) < .025;
+        const emblem = [-.16, 0, .16].some(offset => Math.abs(Math.hypot(x / .43, (y - offset) / .22) - 1) < .11);
+        result.push({ x, y, z: side * .115, nx: 0, nz: side, rim: radius > .93, engraving: ring || emblem });
+      }
+    }
+  }
+  for (let angle = 0; angle < Math.PI * 2; angle += .035) {
+    for (let z = -.115; z <= .116; z += .046) {
+      result.push({ x: Math.cos(angle), y: Math.sin(angle), z, nx: Math.cos(angle), nz: 0, rim: true, engraving: Math.floor(angle / .07) % 2 === 0 });
+    }
+  }
+  return result;
+}
 
 function HandField({ paused }: { paused: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,6 +40,7 @@ function HandField({ paused }: { paused: boolean }) {
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
     const source = new Image();
+    const coin = makeCoin();
     let points: Point[] = [];
     let width = 0, height = 0, frame = 0, last = 0, elapsed = 0, cell = 5;
     let disposed = false, visible = true, loaded = false, revealed = false;
@@ -42,6 +66,7 @@ function HandField({ paused }: { paused: boolean }) {
       const pixels = sc.getImageData(0, 0, sample.width, sample.height).data;
       const scale = artWidth / columns, left = (width - artWidth) / 2;
       const top = height * .51 - source.height * .535 / source.width * artWidth;
+      const clearance = Math.min(76, Math.max(37, width * .052));
       const glyphs = ' .·:+*=#%@';
       points = [];
       for (let y = 0; y < sample.height; y++) {
@@ -51,7 +76,7 @@ function HandField({ paused }: { paused: boolean }) {
           if (light < .12) continue;
           const seed = ((x * 127.1 + y * 311.7) % 997) / 997;
           const density = Math.min(9, Math.max(1, Math.floor((1 - light) * 11 + 2 + seed * 2)));
-          points.push({ x: left + x * scale, y: top + y * scale, light, seed, glyph: glyphs[density] });
+          points.push({ x: left + x * scale + artWidth * .023 + (x < columns * .477 ? -clearance : clearance), y: top + y * scale, light, seed, glyph: glyphs[density] });
         }
       }
     };
@@ -91,6 +116,30 @@ function HandField({ paused }: { paused: boolean }) {
         ctx.fillStyle = `rgba(210,215,225,${opacity})`;
         ctx.fillText(p.glyph, x, y);
       }
+      // Share the hands' clock so pause/resume never resets the rotation.
+      const angle = elapsed * Math.PI * 2 / 5.5 + .24;
+      const cos = Math.cos(angle), sin = Math.sin(angle);
+      const coinRadius = Math.min(62, Math.max(30, width * .043));
+      const coinX = width / 2, coinY = height * .5;
+      const tilt = -.12;
+      const projected = coin.map(p => ({
+        ...p,
+        rx: p.x * cos + p.z * sin,
+        depth: -p.x * sin + p.z * cos,
+        normalX: p.nx * cos + p.nz * sin,
+        normalZ: -p.nx * sin + p.nz * cos,
+      })).filter(p => p.normalZ > -.08).sort((a, b) => a.depth - b.depth);
+      ctx.font = `${Math.max(2.4, coinRadius * .05)}px ui-monospace, SFMono-Regular, Consolas, monospace`;
+      for (const p of projected) {
+        const perspective = 1 + p.depth * .075;
+        const x = (p.rx * Math.cos(tilt) - p.y * Math.sin(tilt)) * coinRadius * perspective;
+        const y = (p.rx * Math.sin(tilt) + p.y * Math.cos(tilt)) * coinRadius * perspective;
+        const lighting = Math.max(0, -.45 * p.normalX + .8 * p.normalZ);
+        const shine = Math.pow(Math.max(0, -.65 * p.normalX + .76 * p.normalZ), 14);
+        const alpha = Math.min(1, .32 + lighting * .48 + shine * .25 + (p.rim ? .14 : 0));
+        ctx.fillStyle = p.engraving ? `rgba(255,230,168,${alpha})` : `rgba(201,162,93,${alpha * .8})`;
+        ctx.fillText(p.engraving ? '#' : p.rim ? '+' : '·', coinX + x, coinY + y);
+      }
       if (loaded && !revealed) { revealed = true; setReady(true); }
     };
     source.onload = () => { if (!disposed) { loaded = true; resize(); } };
@@ -104,7 +153,7 @@ function HandField({ paused }: { paused: boolean }) {
   return <div className="artwork">
     <img className={`artwork-fallback ${ready ? 'is-ready' : ''}`} src="/hands.png" alt="" aria-hidden="true" />
     <canvas ref={canvasRef} className="hand-canvas" tabIndex={0} role="img"
-      aria-label="Birbirine uzanan iki el, hareketli ASCII karakterlerinden oluşuyor. Işığı fareyle, dokunarak veya yön tuşlarıyla gezdirin."
+      aria-label="Birbirine uzanan iki ASCII elin arasında altın renkli bir coin sürekli dönüyor. Işığı fareyle, dokunarak veya yön tuşlarıyla gezdirin."
       onPointerMove={(e) => { const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true }; }}
       onPointerDown={(e) => { const box = e.currentTarget.getBoundingClientRect(); pointer.current = { x: e.clientX - box.left, y: e.clientY - box.top, active: true }; }}
       onPointerLeave={() => { pointer.current.active = false; }}
