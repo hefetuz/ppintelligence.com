@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { HandSource, IntroDefinition, IntroEnvironment } from './intro/types';
 import { advanceCoinAngle, CAMERA_DISTANCE, COIN_HALF_DEPTH, projectCoin, rotateCoin, triangleTransform, visibleFace, type Point2 } from './coin-geometry';
 
 const CURRENCIES = ['$', '€', '£', '¥', '₺', '₹'];
@@ -12,7 +13,7 @@ const smoothstep = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * 
 const out = (n: number) => 1 - Math.pow(1 - clamp(n), 4);
 const seeded = (n: number) => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
 
-type Props = { animate: boolean; skipIntro: boolean; onIntroComplete: () => void };
+type Props = { animate: boolean; skipIntro: boolean; onIntroComplete: () => void; definition?: IntroDefinition };
 type Particle = { x: number; y: number; group: number; seed: number; tx: number; ty: number };
 type Anchor = { x: number; y: number; size: number; rotation: number };
 type HandGlyph = { x: number; y: number; symbol: number; tone: number; seed: number; offsetX: number; offsetY: number; vx: number; vy: number; energy: number };
@@ -20,7 +21,7 @@ type HandLayer = { image: HTMLCanvasElement; glyphs: HTMLCanvasElement; points: 
 type CoinSurface = { points: Point2[]; depth: number; texture?: HTMLCanvasElement; uv?: Point2[]; fill?: string; shade?: number };
 type CoinPose = { x: number; y: number; radius: number; angle: number };
 
-export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) {
+export default function HeroArt({ animate, skipIntro, onIntroComplete, definition }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const options = useRef({ animate, skipIntro, onIntroComplete });
   const pointer = useRef({ x: -1000, y: -1000, active: false, keyboard: false });
@@ -33,6 +34,9 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
     if (!ctx) { options.current.onIntroComplete(); return; }
 
     const source = new Image(), logo = new Image();
+    const experiment = definition?.create();
+    const endTime = definition?.duration ?? 3.95;
+    let introSources: HandSource[][] = [[], []];
     let width = 0, height = 0, dpr = 1, sceneY = 0, baseRadius = 0;
     let frame = 0, last = 0, elapsed = 0, intro = 0, angle = -.3;
     let loaded = false, fontsReady = false, disposed = false, announced = false, visible = true;
@@ -40,6 +44,10 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
     let anchors: Anchor[] = [], particles: Particle[] = [], hands: HandLayer[] = [];
     const face = document.createElement('canvas');
     const reverse = document.createElement('canvas');
+    const blankFace = document.createElement('canvas');
+    const mintedFace = document.createElement('canvas');
+    blankFace.width = blankFace.height = mintedFace.width = mintedFace.height = 640;
+    let lastMint = -1;
     const sprite = document.createElement('canvas');
     const spotlight = document.createElement('canvas');
     const lightCtx = spotlight.getContext('2d');
@@ -53,7 +61,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       if (!announced) { announced = true; options.current.onIntroComplete(); }
     };
     // Asset failures, background tabs and slow connections cannot lock access to the page.
-    const fallback = window.setTimeout(() => { intro = 5; finish(); }, 6500);
+    const fallback = window.setTimeout(() => { intro = endTime + 1; finish(); }, 8500);
 
     const buildCoin = () => {
       face.width = face.height = 640;
@@ -81,6 +89,8 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
         c.beginPath(); c.moveTo(cx + Math.cos(a) * 288, cy + Math.sin(a) * 288);
         c.lineTo(cx + Math.cos(a) * 297, cy + Math.sin(a) * 297); c.stroke();
       }
+      blankFace.getContext('2d')?.drawImage(face, 0, 0);
+      lastMint = -1;
       if (logo.complete && logo.naturalWidth) {
         const stamp = document.createElement('canvas'); stamp.width = stamp.height = 300;
         const s = stamp.getContext('2d');
@@ -226,6 +236,23 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
         }
         return { image: sculpture, glyphs, points, side, x: left + cropX * scale + (side ? clearance : -clearance), y: top + cropY * scale, width: logicalWidth, height: logicalHeight };
       });
+      introSources = hands.map(hand => hand.points.filter((p, i) => i % Math.max(1, Math.floor(hand.points.length / 130)) === 0 && p.tone > .15).map(p => ({ x: hand.x + p.x, y: hand.y + p.y, symbol: p.symbol, seed: p.seed, tone: p.tone })));
+    };
+
+    const introEnvironment = (reveal: number): IntroEnvironment => {
+      const transform = (p: { x: number; y: number }, side: number) => {
+        const pose = handPose(side, reveal), c = Math.cos(pose.rotation), s = Math.sin(pose.rotation);
+        const x = p.x - pose.pivot, y = p.y - sceneY;
+        return { x: pose.pivot + pose.dx + x * c - y * s, y: sceneY + pose.dy + x * s + y * c };
+      };
+      return {
+        width, height, sceneY, radius: baseRadius, sprite,
+        handSources: introSources.map((points, side) => points.map(p => ({ ...p, ...transform(p, side) }))) as [HandSource[], HandSource[]],
+        fingertips: [0, 1].map(side => {
+          const hand = hands[side];
+          return transform({ x: hand ? hand.x + (side ? 0 : hand.width) : width / 2 + (side ? 1 : -1) * baseRadius * 1.4, y: sceneY - 4 }, side);
+        }) as IntroEnvironment['fingertips'],
+      };
     };
 
     const handPose = (side: number, reveal: number) => {
@@ -239,7 +266,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       };
     };
 
-    const drawHands = (reveal: number, delta: number, moving: boolean) => {
+    const drawHands = (reveal: number, delta: number, moving: boolean, warmth = 1) => {
       if (!handCtx) return;
       handCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
       handCtx.clearRect(0, 0, width, height);
@@ -265,13 +292,15 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
         glow.addColorStop(0, 'rgba(226,172,93,.37)'); glow.addColorStop(.35, 'rgba(226,172,93,.17)'); glow.addColorStop(1, 'transparent');
         reflectionCtx.fillStyle = glow; reflectionCtx.fillRect(0, 0, width, height);
         handCtx.globalCompositeOperation = 'screen';
+        handCtx.globalAlpha = warmth;
         handCtx.drawImage(handReflection, 0, 0, width, height);
+        handCtx.globalAlpha = 1;
         handCtx.globalCompositeOperation = 'source-over';
       }
 
-      const active = pointer.current.active && moving && intro > 3.9;
+      const active = pointer.current.active && moving && intro >= endTime;
       const field = clamp(width * .11, 72, 112);
-      if (lightCtx && lightStrength > .01 && intro > 3.9) {
+      if (lightCtx && lightStrength > .01 && intro >= endTime) {
         lightCtx.setTransform(dpr, 0, 0, dpr, 0, 0); lightCtx.clearRect(0, 0, width, height);
         lightCtx.globalCompositeOperation = 'source-over'; lightCtx.drawImage(handScene, 0, 0, width, height);
         lightCtx.globalCompositeOperation = 'source-in';
@@ -283,7 +312,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       }
 
       // Lift only a local patch of the material. The surrounding anatomy never disappears.
-      if (moving && intro > 3.9 && lightStrength > .01) {
+      if (moving && intro >= endTime && lightStrength > .01) {
         handCtx.globalCompositeOperation = 'destination-out';
         const hole = handCtx.createRadialGradient(lightX, lightY, 0, lightX, lightY, field);
         hole.addColorStop(0, 'rgba(0,0,0,' + lightStrength * .68 + ')');
@@ -326,8 +355,26 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       ctx.globalAlpha = 1;
     };
 
-    const drawCoin = (pose: CoinPose, alpha: number) => {
+    const drawCoin = (pose: CoinPose, alpha: number, mint = 1) => {
       if (!faceReady || alpha <= 0) return;
+      let frontTexture = face;
+      if (mint < 1) {
+        if (Math.abs(mint - lastMint) > .002 || lastMint < 0) {
+          const m = mintedFace.getContext('2d');
+          if (m) {
+            m.clearRect(0, 0, 640, 640);
+            // Material closes from the milled rim inward; the seal is struck last.
+            const fill = smoothstep((mint - .12) / .56);
+            m.save(); m.beginPath(); m.arc(320, 320, 301, 0, Math.PI * 2);
+            m.arc(320, 320, Math.max(.001, 280 * (1 - fill)), 0, Math.PI * 2, true); m.clip('evenodd');
+            m.drawImage(blankFace, 0, 0); m.restore();
+            const seal = smoothstep((mint - .66) / .34);
+            if (seal > 0) { m.save(); m.beginPath(); m.rect(0, 0, 640, 640 * seal); m.clip(); m.drawImage(face, 0, 0); m.restore(); }
+          }
+          lastMint = mint;
+        }
+        frontTexture = mintedFace;
+      }
       const tilt = .17 + hover * .04;
       const center = { x: pose.x, y: pose.y };
       const surfaces: CoinSurface[] = [];
@@ -362,9 +409,9 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
           surfaces.push({
             points: vertices.map(v => v.screen),
             depth: vertices.reduce((sum, v) => sum + v.world.z, 0) / 3,
-            texture: side === 1 ? face : reverse,
+            texture: mint < 1 ? frontTexture : side === 1 ? face : reverse,
             uv: [{ x: 320, y: 320 }, { x: 320 + Math.cos(a) * 300, y: 320 + Math.sin(a) * 300 }, { x: 320 + Math.cos(b) * 300, y: 320 + Math.sin(b) * 300 }],
-            shade: (1 - light) * .3,
+            shade: (1 - light) * .3 * smoothstep((mint - .12) / .56),
           });
         }
       }
@@ -403,31 +450,33 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       if (time - last < 1000 / 60) return;
       const delta = Math.min((time - last) / 1000, .04); last = time;
       const moving = options.current.animate;
-      if (!moving || options.current.skipIntro) { intro = 5; finish(); }
+      if (!moving || options.current.skipIntro) { intro = Math.max(intro, endTime + 1); finish(); }
       if (moving) {
         elapsed += delta;
         if (loaded && fontsReady) intro += delta;
         angle = advanceCoinAngle(angle, delta);
       }
-      if (intro >= 3.45) finish();
+      if (intro >= (definition?.releaseAt ?? 3.45)) finish();
       ctx.fillStyle = INK; ctx.fillRect(0, 0, width, height);
 
+      const env = experiment ? introEnvironment(1) : undefined;
+      const shot = experiment && env ? experiment.frame(intro, env) : undefined;
       const converge = smoothstep((intro - 1) / 1.6);
-      const transfer = smoothstep((intro - 2.5) / 1.15);
-      const revealHands = clamp((intro - 2.65) / 1.3);
-      const coinAlpha = smoothstep((intro - 2) / .65);
+      const transfer = shot?.transfer ?? smoothstep((intro - 2.5) / 1.15);
+      const revealHands = shot?.hands ?? clamp((intro - 2.65) / 1.3);
+      const coinAlpha = shot?.coinAlpha ?? smoothstep((intro - 2) / .65);
       const introRadius = baseRadius * (width < 760 ? 1.85 : 2);
-      const coinY = mix(height * .41, sceneY, transfer);
-      const coinRadius = mix(introRadius, baseRadius, transfer);
+      const coinY = shot?.coinY ?? mix(height * .41, sceneY, transfer);
+      const coinRadius = shot?.coinRadius ?? mix(introRadius, baseRadius, transfer);
       const t = pointer.current;
-      const hit = t.active && intro > 3.45 && Math.hypot(t.x - width / 2, t.y - sceneY) < baseRadius * 1.5;
+      const hit = t.active && intro >= endTime && Math.hypot(t.x - width / 2, t.y - sceneY) < baseRadius * 1.5;
       const follow = t.keyboard ? 1 : 1 - Math.exp(-delta * 8);
       if (moving) hover += ((hit ? 1 : 0) - hover) * follow;
       if (lightStrength < .01 && t.active) { lightX = t.x; lightY = t.y; }
       lightX += (t.x - lightX) * follow; lightY += (t.y - lightY) * follow;
       lightStrength += ((t.active ? 1 : 0) - lightStrength) * follow;
 
-      if (intro < 2.8) {
+      if (!experiment && intro < 2.8) {
         const solidAlpha = out(intro / .32) * (1 - smoothstep((intro - .8) / .5));
         for (const [i, a] of anchors.entries()) {
           const orbit = Math.min(intro, 1.15);
@@ -462,19 +511,20 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
         }
       }
 
-      if (revealHands > 0) drawHands(revealHands, delta, moving);
+      if (revealHands > 0) drawHands(revealHands, delta, moving, shot?.handLight ?? 1);
+      if (experiment && shot && intro < endTime) experiment.draw(ctx, intro, introEnvironment(revealHands), shot);
       // A quiet halo is local to the focal object, never a full-page decorative wash.
       if (coinAlpha > 0) {
         const glowRadius = coinRadius * (2 + hover * .4);
         const glow = ctx.createRadialGradient(width / 2, coinY, 0, width / 2, coinY, glowRadius);
         glow.addColorStop(0, 'rgba(193,136,64,' + coinAlpha * (.085 + hover * .06) + ')'); glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow; ctx.fillRect(width / 2 - glowRadius, coinY - glowRadius, glowRadius * 2, glowRadius * 2);
-        drawCoin({ x: width / 2, y: coinY - hover * 8 + Math.sin(elapsed * .85) * 3 * transfer, radius: coinRadius * (1 + hover * .08), angle: mix(-.3, angle, smoothstep((intro - 2.15) / 1)) }, coinAlpha);
+        drawCoin({ x: width / 2, y: coinY - hover * 8 + Math.sin(elapsed * .85) * 3 * transfer, radius: coinRadius * (1 + hover * .08), angle: shot?.angle ?? mix(-.3, angle, smoothstep((intro - 2.15) / 1)) }, coinAlpha, shot?.mint ?? 1);
       }
     };
 
     source.onload = () => { if (!disposed) { loaded = true; resize(); } };
-    source.onerror = () => { intro = 5; finish(); };
+    source.onerror = () => { intro = endTime + 1; finish(); };
     source.src = '/hands.png';
     logo.onload = () => { if (!disposed) buildCoin(); };
     logo.src = '/pp-logo.svg';
@@ -487,7 +537,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete }: Props) 
       disposed = true; cancelAnimationFrame(frame); clearTimeout(fallback);
       observer.disconnect(); intersection.disconnect(); source.onload = null; source.onerror = null; logo.onload = null;
     };
-  }, []);
+  }, [definition]);
 
   return <canvas ref={canvasRef} className="hand-canvas" tabIndex={0} role="img"
     aria-label="A rotating Pretty Penny coin floats between two sculptural hands. Explore a hand with your pointer or touch to lift a small patch of currency symbols. Arrow keys move the light; Escape releases it."

@@ -4,11 +4,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { ArrowUpRight, Pause, Play, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeroArt from './hero-art';
+import { DEFAULT_INTRO, findIntro, INTRO_DEFINITIONS } from './intro/registry';
+import type { IntroId } from './intro/types';
 
 const BOOKING_URL = 'https://calendly.com/dtudor-prettypennyintelligence/introductory-meeting';
 
 export default function Home() {
   const [intro, setIntro] = useState(true);
+  const [introId, setIntroId] = useState<IntroId>(DEFAULT_INTRO);
+  const [compare, setCompare] = useState(false);
+  const [configured, setConfigured] = useState(false);
+  const definition = findIntro(introId);
   const [skipIntro, setSkipIntro] = useState(false);
   const [replay, setReplay] = useState(0);
   const [reduced, setReduced] = useState(false);
@@ -19,13 +25,30 @@ export default function Home() {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => setReduced(media.matches);
     sync(); media.addEventListener('change', sync);
+    const query = new URLSearchParams(window.location.search);
+    const requested = query.get('intro');
+    setIntroId(requested === 'original' ? 'original' : findIntro(requested)?.id ?? DEFAULT_INTRO);
+    setCompare(query.get('compare') === '1');
+    setConfigured(true);
     return () => media.removeEventListener('change', sync);
   }, []);
   const replayIntro = () => {
     setMotionOverride(true); setSkipIntro(false); setIntro(true); setReplay(value => value + 1);
   };
-  return <main className={'hero ' + (intro ? 'intro-running' : 'scene-ready') + (animate ? '' : ' motion-paused')}>
-    <div className="artwork"><HeroArt key={replay} animate={animate} skipIntro={skipIntro} onIntroComplete={finishIntro} /></div>
+  const selectIntro = (id: IntroId) => {
+    setIntroId(id); setSkipIntro(false); setIntro(true); setReplay(value => value + 1);
+    const url = new URL(window.location.href); url.searchParams.set('intro', id); url.searchParams.set('compare', '1');
+    window.history.replaceState(null, '', url);
+  };
+  return <>
+    {compare && <aside className="intro-lab" aria-label="Açılış animasyonlarını karşılaştır">
+      <span className="lab-label">Açılış denemeleri</span>
+      <div className="lab-options">{INTRO_DEFINITIONS.map((item, index) => <Button key={item.id} variant="ghost" className="lab-choice" aria-pressed={introId === item.id} onClick={() => selectIntro(item.id)} title={item.description}><span className="lab-number">0{index + 1}</span>{item.shortTitle}</Button>)}</div>
+      <Button variant="ghost" className="lab-replay" onClick={replayIntro} aria-label="Seçili animasyonu tekrar oynat"><RotateCcw size={15} /><span>Tekrar</span></Button>
+      <a className="lab-close" href="/" aria-label="Karşılaştırmayı kapat, mevcut sürüme dön">Kapat <span aria-hidden="true">×</span></a>
+    </aside>}
+    <main className={'hero ' + (intro ? 'intro-running' : 'scene-ready') + (animate ? '' : ' motion-paused')}>
+    <div className="artwork">{configured && <HeroArt key={introId + replay} animate={animate} skipIntro={skipIntro} onIntroComplete={finishIntro} definition={definition} />}</div>
     <header className="hero-header">
       <a className="identity" href="/" aria-label="Pretty Penny Intelligence home">
         <img className="pp-mark" src="/pp-logo.svg" alt="" width={44} height={44} />
@@ -63,10 +86,10 @@ export default function Home() {
     </footer>
     <div className="intro-caption" aria-hidden={!intro} inert={!intro}>
       <span className="intro-label">Pretty Penny Intelligence</span>
-      <p>Possibility, taking shape.</p>
+      <p>{definition?.caption ?? 'Possibility, taking shape.'}</p>
       <Button className="skip-intro" variant="ghost" onClick={() => { setSkipIntro(true); setIntro(false); }}>Skip intro <ArrowUpRight size={15} /></Button>
     </div>
     <p className="sr-only" role="status">{intro ? 'Introducing Pretty Penny Intelligence. You can skip the introduction.' : 'The hero is ready.'}</p>
     <noscript><style>{'.hero-title,.hero-bottom,.hero-footer,.header-contact,.header-descriptor,.scene-annotation,.t-stagger-line{opacity:1!important;visibility:visible!important;transform:none!important;filter:none!important}.intro-caption{display:none!important}'}</style><p className="no-script-message">Strategic advisory by Deniz K. Tudor. <a href={BOOKING_URL}>Book an introductory call.</a></p></noscript>
-  </main>;
+  </main></>;
 }
