@@ -9,14 +9,13 @@ export function renderBudget(width: number, height: number, deviceRatio: number,
 
 export function handLayout(width: number, stageHeight: number, radius: number) {
   const desktop = width >= 761;
-  const bleed = desktop ? Math.min(330, Math.max(180, width * .16)) : 72;
+  const bleed = desktop ? Math.min(210, Math.max(120, width * .1)) : 72;
 
   return {
-    // On desktop the artwork follows viewport width instead of the shallow stage
-    // height. This keeps the hands large and lets the hero crop the forearms
-    // naturally instead of stretching a narrow source strip to the screen edge.
-    artWidth: desktop ? width * 1.2 : width * 1.58,
-    clearance: radius * (desktop ? 1.18 : 1.3),
+    // Oversize the source artwork on desktop so the hands stay dominant and
+    // the long forearms are naturally cropped instead of visually stretched.
+    artWidth: desktop ? width * 1.46 : width * 1.58,
+    clearance: radius * (desktop ? 1.16 : 1.3),
     bleed,
   };
 }
