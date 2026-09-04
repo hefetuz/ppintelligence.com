@@ -1,4 +1,4 @@
-import { bezier, enter, mix, phase, spinAngle, TAU } from './motion';
+import { bezier, enter, mix, phase, projectedRim, spinAngle, TAU } from './motion';
 import type { IntroDefinition, IntroEnvironment, IntroFrame, Point } from './types';
 
 type Segment = [number, number, number, number, number, number, number, number];
@@ -48,8 +48,8 @@ const rings = [1, .927, .852].map((radius, j) => Array.from({ length: 100 }, (_,
 export function morphFrame(t: number, e: IntroEnvironment): IntroFrame {
   const transfer = phase(t, 3.6, 1.15);
   return {
-    coinY: mix(e.height * .4, e.sceneY, transfer),
-    coinRadius: mix(e.radius * (e.width < 760 ? 2.1 : 2.2), e.radius, transfer),
+    coinY: mix(e.introY ?? e.height * .4, e.sceneY, transfer),
+    coinRadius: mix(Math.min(e.introMaxRadius ?? Infinity, e.radius * (e.width < 760 ? 2.1 : 2.2)), e.radius, transfer),
     coinAlpha: phase(t, 2.96, .36), mint: phase(t, 3.05, .66),
     angle: spinAngle(t, 3.38), hands: phase(t, 3.52, 1.2),
     handLight: phase(t, 3.62, .7), transfer,
@@ -73,19 +73,22 @@ export const morphIntro: IntroDefinition = {
         const points = dollar.map((stroke, j) => stroke.map((p, i) => {
           const x = mix(mix(p.x, euro[j][i].x, a), pound[j][i].x, b);
           const y = mix(mix(p.y, euro[j][i].y, a), pound[j][i].y, b);
-          return { x: mix(x, rings[j][i].x, curl), y: mix(y, rings[j][i].y, curl) };
+          const ring = rings[j][i];
+          const projected = projectedRim(Math.atan2(ring.y, ring.x), Math.hypot(ring.x, ring.y), f.angle);
+          return { x: mix(x, projected.x, curl), y: mix(y, projected.y, curl) };
         }));
         ctx.save(); ctx.globalAlpha = opacity;
         ctx.translate(e.width / 2, f.coinY);
         const rotation = -.05 * (1 - curl) + Math.sin(t * .9) * .025 * (1 - curl);
         ctx.rotate(rotation);
         ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-        const metal = ctx.createLinearGradient(-size, -size, size, size);
+        const sweep = Math.sin(t * .72) * size * .4;
+        const metal = ctx.createLinearGradient(-size + sweep, -size, size + sweep, size);
         metal.addColorStop(0, '#8c653b'); metal.addColorStop(.2, '#f9e4bd'); metal.addColorStop(.43, '#ddbc8a'); metal.addColorStop(.68, '#916335'); metal.addColorStop(1, '#ead0a5');
         const trace = (stroke: Point[]) => {
           ctx.beginPath(); stroke.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x * size, p.y * size); else ctx.lineTo(p.x * size, p.y * size); });
         };
-        const thickness = mix(size * .085, size * .017, curl);
+        const thickness = mix(size * .1, size * .012, curl);
         for (const stroke of points) {
           ctx.save(); ctx.translate(2.1, 2.8); trace(stroke); ctx.lineWidth = thickness + 2; ctx.strokeStyle = '#6c4627'; ctx.stroke(); ctx.restore();
           trace(stroke); ctx.lineWidth = thickness; ctx.strokeStyle = metal; ctx.stroke();

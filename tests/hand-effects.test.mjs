@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
 
 const root = new URL('../app/', import.meta.url);
-const source = (await readFile(new URL('hand-effects.ts', root), 'utf8')).replace("from './hand-motion'", `from '${new URL('hand-motion.ts', root).href}'`);
+const source = (await readFile(new URL('hand-effects.ts', root), 'utf8')).replace("from './hand-motion'", `from '${new URL('hand-motion.ts', root).href}'`).replace("from './coin-geometry'", `from '${new URL('coin-geometry.ts', root).href}'`);
 const { createHandEffects } = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(source)).toString('base64'));
 let draws = 0;
 const context = new Proxy({}, {
@@ -36,7 +36,7 @@ for (const direction of ['orbit', 'morph', 'hands']) {
     assert.ok(effects.pose(0).dx > 2, 'hovered hand responds');
     assert.equal(effects.pose(1).dx, -0, 'other hand is not dragged along');
     assert.ok(draws > 120, 'surface has a real drawn response');
-    if (direction !== 'morph') assert.ok(input.hands[0].points.some(p => Math.hypot(p.offsetX, p.offsetY) > 20));
+    assert.ok(input.hands[0].points.every(p => p.offsetX === 0 && p.offsetY === 0), 'engraving remains attached to the deformed sculpture');
     const paused = input.hands[0].points.map(p => [p.offsetX, p.offsetY, p.energy]);
     input.moving = false; effects.render(input);
     assert.deepEqual(input.hands[0].points.map(p => [p.offsetX, p.offsetY, p.energy]), paused);

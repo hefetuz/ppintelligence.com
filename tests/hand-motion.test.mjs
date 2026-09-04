@@ -1,8 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { advanceHandSpring, handField, materialTone, surfaceWarp } from '../app/hand-motion.ts';
+import { advanceHandSpring, handField, materialTone, surfaceWarp, touchWarp } from '../app/hand-motion.ts';
 
 for (const direction of ['orbit', 'morph', 'hands']) {
+  test(`${direction}: touch mesh retains its perimeter and has bounded local deformation`, () => {
+    for (let a = 0; a < Math.PI * 2; a += .08) {
+      const edge = touchWarp(direction, Math.cos(a) * 120, Math.sin(a) * 120, 120, 1.8, 1);
+      assert.ok(Math.hypot(edge.x, edge.y) < 1e-8);
+    }
+    let maximum = 0;
+    for (let x = -120; x <= 120; x += 12) for (let y = -120; y <= 120; y += 12) {
+      const point = touchWarp(direction, x, y, 120, 1.8, 1, { x: 40, y: -30 });
+      const distance = Math.hypot(point.x, point.y);
+      assert.ok(Number.isFinite(distance) && distance < 30);
+      maximum = Math.max(maximum, distance);
+    }
+    assert.ok(maximum > 1, 'material visibly responds');
+  });
   test(`${direction}: the hand field is finite, bounded and zero outside its radius`, () => {
     for (let t = 0; t < 20; t += .13) for (let k = 0; k < 8; k++) {
       const field = handField(direction, { x: 200 + k * 14, y: 100 + k * 8, cx: 240, cy: 140, radius: 178, time: t, seed: k / 8, side: k % 2, strength: 1 });
