@@ -1,21 +1,22 @@
 export function renderBudget(width: number, height: number, deviceRatio: number, constrained: boolean) {
-  const pixels = constrained ? 1_150_000 : 2_200_000;
+  const pixels = constrained ? 1_700_000 : 6_400_000;
   return {
-    dpr: Math.min(deviceRatio || 1, constrained ? 1.25 : 1.6, Math.sqrt(pixels / Math.max(1, width * height))),
-    meshCells: constrained ? 6 : 9,
-    introSamples: constrained ? 65 : 100,
+    dpr: Math.min(deviceRatio || 1, constrained ? 1.4 : 2.05, Math.sqrt(pixels / Math.max(1, width * height))),
+    meshCells: constrained ? 7 : 12,
+    introSamples: constrained ? 80 : 128,
   };
 }
 
 export function handLayout(width: number, stageHeight: number, radius: number) {
   const desktop = width >= 761;
+  const bleed = desktop ? Math.min(330, Math.max(180, width * .16)) : 72;
+
   return {
-    // Keep the hands visually dominant on wide screens. The artwork is deliberately
-    // larger than the viewport so excess forearm length is cropped by the hero.
-    artWidth: desktop
-      ? Math.min(width * 1.34, Math.max(stageHeight, 260) * 4.15)
-      : width * 1.58,
-    clearance: radius * 1.34,
-    bleed: desktop ? 120 : 72,
+    // On desktop the artwork follows viewport width instead of the shallow stage
+    // height. This keeps the hands large and lets the hero crop the forearms
+    // naturally instead of stretching a narrow source strip to the screen edge.
+    artWidth: desktop ? width * 1.2 : width * 1.58,
+    clearance: radius * (desktop ? 1.18 : 1.3),
+    bleed,
   };
 }
