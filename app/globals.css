@@ -1,6 +1,9 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source(none);
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@source './page.tsx';
+@source './art-cursor.tsx';
+@source '../components/ui/button.tsx';
 
 @font-face { font-family: 'Instrument Serif'; src: url('/fonts/instrument-serif.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Instrument Serif'; src: url('/fonts/instrument-serif-italic.ttf') format('truetype'); font-style: italic; font-weight: 400; font-display: swap; }
@@ -45,15 +48,15 @@
   --stagger-ease: cubic-bezier(.22, 1, .36, 1);
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; min-width: 320px; background: var(--ink); }
+html, body { margin: 0; min-width: 320px; background: var(--ink); overflow-x: clip; }
 body { font-family: Manrope, Arial, sans-serif; color: var(--paper); -webkit-font-smoothing: antialiased; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 :focus-visible { outline: 2px solid var(--penny); outline-offset: 6px; }
 ::selection { background: var(--penny); color: var(--ink); }
-.hero { position: relative; isolation: isolate; width: 100%; min-height: max(760px, 100svh); display: grid; grid-template-rows: 96px auto minmax(240px, 1fr) auto 68px; overflow: hidden; }
-.intro-lab + .hero { min-height: max(760px, calc(100svh - 72px)); }
+.hero { position: relative; isolation: isolate; width: 100%; min-height: max(720px, 100svh); display: grid; grid-template-rows: 88px auto minmax(240px, 1fr) auto 64px; overflow: hidden; }
+.intro-lab + .hero { min-height: max(720px, calc(100svh - 72px)); }
 .artwork { position: absolute; inset: 0; z-index: -1; }
 .hand-canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
 .hand-canvas:focus-visible { outline-offset: -8px; }
@@ -67,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 .header-contact > span { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--hairline); border-radius: 50%; transition: background var(--duration-fast) ease, transform var(--duration-fast) var(--ease-smooth-out); }
 .hero-title { grid-row: 2; padding: clamp(12px, 2.6vh, 32px) 24px 0; text-align: center; z-index: 2; pointer-events: none; }
 .eyebrow { margin: 0 0 20px; color: var(--silver); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
-h1 { margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(88px, min(9.6vw, 14vh), 150px); font-weight: 400; letter-spacing: -.035em; line-height: .87; }
+h1 { margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(76px, min(9.2vw, 12.4svh), 142px); font-weight: 400; letter-spacing: -.035em; line-height: .87; }
 h1 em { font-weight: 400; color: var(--penny); padding-bottom: 16px; }
 .scene-annotation { grid-row: 3; align-self: end; justify-self: center; display: flex; gap: 12px; align-items: center; margin-bottom: 22px; color: var(--smoke); font-size: 12px; pointer-events: none; }
 .scene-annotation > span { width: 20px; height: 1px; background: var(--penny); }
@@ -152,6 +155,14 @@ h1 em { font-weight: 400; color: var(--penny); padding-bottom: 16px; }
   .founder:hover,.linkedin-link:hover { color: var(--paper); }
 }
 @media (min-width: 1440px) and (min-height: 900px) { .hero { grid-template-rows: 108px auto minmax(310px, 1fr) auto 76px; }.hero-title { padding-top: 30px; } }
+@media (min-width: 761px) and (max-height: 820px) {
+  .hero { grid-template-rows: 72px auto minmax(200px, 1fr) auto 56px; min-height: 100svh; }
+  .intro-lab + .hero { min-height: calc(100svh - 72px); }
+  .hero-title { padding-top: 8px; }.eyebrow { margin-bottom: 14px; }
+  h1 { font-size: clamp(68px, min(8vw, 10.8svh), 100px); } h1 em { padding-bottom: 8px; }
+  .hero-bottom { padding: 18px 0; }.hero-description { line-height: 1.55; }
+  .scene-annotation { margin-bottom: 12px; }
+}
 @media (max-width: 760px) {
   .hero,.intro-lab + .hero { grid-template-rows: 88px auto minmax(265px, 1fr) auto auto; min-height: max(920px, 100svh); }
   .header-descriptor { display: none; }.pp-mark { width: 32px; height: 36px; }.wordmark { font-size: 18px; }.wordmark span { font-size: 12px; letter-spacing: .1em; margin-top: 6px; }.identity { gap: 12px; }
