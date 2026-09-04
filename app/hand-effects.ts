@@ -12,7 +12,7 @@ type Input = {
   interactive: boolean; moving: boolean; reveal: number;
 };
 
-export function createHandEffects(direction: HandDirection) {
+export function createHandEffects(direction: HandDirection, meshCells = 9) {
   const profile = HAND_DIRECTIONS[direction];
   const patch = document.createElement('canvas'), sample = document.createElement('canvas');
   const c = patch.getContext('2d'), s = sample.getContext('2d');
@@ -28,7 +28,7 @@ export function createHandEffects(direction: HandDirection) {
     s.clearRect(0, 0, size, size);
     s.drawImage(i.material, left * dpr, top * dpr, size * dpr, size * dpr, 0, 0, size, size);
     c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, size, size);
-    const cells = 12, step = size / cells;
+    const cells = meshCells, step = size / cells;
     const vertices: Point2[] = [];
     for (let row = 0; row <= cells; row++) for (let col = 0; col <= cells; col++) {
       const px = col * step, py = row * step;
@@ -98,11 +98,13 @@ export function createHandEffects(direction: HandDirection) {
       const nearest = [Infinity, Infinity];
       if (i.pointer.active && i.interactive) for (const hand of i.hands) {
         const pose = i.poses[hand.side], co = Math.cos(pose.rotation), si = Math.sin(pose.rotation);
+        const dx = i.pointer.x - pose.pivot - pose.dx, dy = i.pointer.y - i.sceneY - pose.dy;
+        const px = dx * co + dy * si + pose.pivot - hand.x;
+        const py = -dx * si + dy * co + i.sceneY - hand.y;
+        if (px < -20 || py < -20 || px > hand.width + 20 || py > hand.height + 20) continue;
         for (const p of hand.points) {
-          const lx = hand.x + p.x - pose.pivot, ly = hand.y + p.y - i.sceneY;
-          const px = pose.pivot + pose.dx + lx * co - ly * si;
-          const py = i.sceneY + pose.dy + lx * si + ly * co;
-          nearest[hand.side] = Math.min(nearest[hand.side], (px - i.pointer.x) ** 2 + (py - i.pointer.y) ** 2);
+          nearest[hand.side] = Math.min(nearest[hand.side], (px - p.x) ** 2 + (py - p.y) ** 2);
+          if (nearest[hand.side] < 400) break;
         }
       }
       const hit = i.pointer.active && i.interactive && Math.min(...nearest) < 400;
