@@ -1,0 +1,79 @@
+.artwork {
+  overflow: hidden;
+}
+
+.hand-canvas {
+  position: relative;
+  z-index: 0;
+  transform: scale(1.045) translateY(0.7%);
+  transform-origin: 50% 54%;
+  filter: contrast(1.055) brightness(1.025);
+  image-rendering: auto;
+}
+
+.artwork::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 50% 57%,
+      rgba(216, 171, 108, 0.07) 0%,
+      rgba(216, 171, 108, 0.035) 15%,
+      rgba(216, 171, 108, 0.012) 29%,
+      transparent 45%
+    );
+}
+
+.artwork::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(145px, 22vh, 235px);
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(9, 11, 13, 0) 0%,
+      rgba(243, 240, 232, 0.014) 18%,
+      rgba(243, 240, 232, 0.032) 34%,
+      rgba(243, 240, 232, 0.042) 46%,
+      rgba(9, 11, 13, 0.10) 61%,
+      rgba(9, 11, 13, 0.36) 77%,
+      rgba(9, 11, 13, 0.76) 91%,
+      rgba(9, 11, 13, 0.96) 100%
+    );
+  -webkit-backdrop-filter: blur(14px) saturate(0.92);
+  backdrop-filter: blur(14px) saturate(0.92);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 34%, #000 100%);
+}
+
+@media (min-width: 1440px) {
+  .hand-canvas {
+    transform: scale(1.06) translateY(0.8%);
+    filter: contrast(1.065) brightness(1.03);
+  }
+
+  .artwork::after {
+    height: clamp(165px, 23vh, 250px);
+  }
+}
+
+@media (max-width: 760px) {
+  .hand-canvas {
+    transform: none;
+    filter: none;
+  }
+
+  .artwork::after {
+    height: 150px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
