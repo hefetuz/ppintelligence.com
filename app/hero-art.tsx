@@ -4,7 +4,8 @@ import { useEffect, useRef } from 'react';
 import { createHandEffects } from './hand-effects';
 import { HAND_DIRECTIONS, materialTone } from './hand-motion';
 import type { HandSource, IntroDefinition, IntroEnvironment } from './intro/types';
-import { advanceCoinAngle, CAMERA_DISTANCE, COIN_HALF_DEPTH, projectCoin, rotateCoin, triangleTransform, visibleFace, type Point2 } from './coin-geometry';
+import { CAMERA_DISTANCE, COIN_HALF_DEPTH, projectCoin, rotateCoin, triangleTransform, visibleFace, type Point2 } from './coin-geometry';
+import { spinAngle } from './intro/motion';
 
 const CURRENCIES = ['$', '€', '£', '¥', '₺', '₹'];
 const SYMBOL_FONT = 'Consolas, "Segoe UI Symbol", monospace';
@@ -40,9 +41,9 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     const handEffects = definition ? createHandEffects(definition.id) : null;
     const endTime = definition?.duration ?? 3.95;
     let introSources: HandSource[][] = [[], []];
-    let width = 0, height = 0, dpr = 1, sceneY = 0, baseRadius = 0;
-    let frame = 0, last = 0, elapsed = 0, intro = 0, angle = -.3;
-    let loaded = false, fontsReady = false, disposed = false, announced = false, visible = true;
+    let width = 0, height = 0, dpr = 1, sceneY = 0, baseRadius = 0, introY = 0, introMaxRadius = 180;
+    let frame = 0, last = 0, elapsed = 0, intro = 0;
+    let loaded = false, fontsReady = false, disposed = false, announced = false, visible = true, staticRendered = false;
     let hover = 0, lightX = 0, lightY = 0, lightStrength = 0;
     let anchors: Anchor[] = [], particles: Particle[] = [], hands: HandLayer[] = [];
     const face = document.createElement('canvas');
@@ -61,12 +62,13 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     let faceReady = false;
 
     const finish = () => {
-      if (!announced) { announced = true; options.current.onIntroComplete(); }
+      if (!announced) { announced = true; clearTimeout(fallback); options.current.onIntroComplete(); }
     };
     // Asset failures, background tabs and slow connections cannot lock access to the page.
-    const fallback = window.setTimeout(() => { intro = endTime + 1; finish(); }, 8500);
+    const fallback = window.setTimeout(() => { if (!announced) { intro = Math.max(intro, endTime + 1); finish(); } }, 8500);
 
     const buildCoin = () => {
+      staticRendered = false;
       face.width = face.height = 640;
       const c = face.getContext('2d');
       if (!c) return;
@@ -145,9 +147,13 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     };
 
     const resize = () => {
+      staticRendered = false;
       const box = canvas.getBoundingClientRect();
       width = box.width; height = box.height;
       if (!width || !height) return;
+      const visibleHeight = Math.min(height, window.innerHeight - Math.max(0, box.top));
+      introY = Math.min(height * .4, visibleHeight * .4);
+      introMaxRadius = Math.max(48, visibleHeight - 252 - introY);
       dpr = Math.min(window.devicePixelRatio || 1, 1.75);
       canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -246,14 +252,14 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
       introSources = hands.map(hand => hand.points.filter((p, i) => i % Math.max(1, Math.floor(hand.points.length / 130)) === 0 && p.tone > .15).map(p => ({ x: hand.x + p.x, y: hand.y + p.y, symbol: p.symbol, seed: p.seed, tone: p.tone })));
     };
 
-    const introEnvironment = (reveal: number): IntroEnvironment => {
+    const introEnvironment = (reveal: number, offsetY = 0): IntroEnvironment => {
       const transform = (p: { x: number; y: number }, side: number) => {
         const pose = handPose(side, reveal), c = Math.cos(pose.rotation), s = Math.sin(pose.rotation);
         const x = p.x - pose.pivot, y = p.y - sceneY;
-        return { x: pose.pivot + pose.dx + x * c - y * s, y: sceneY + pose.dy + x * s + y * c };
+        return { x: pose.pivot + pose.dx + x * c - y * s, y: sceneY + pose.dy + x * s + y * c + offsetY };
       };
       return {
-        width, height, sceneY, radius: baseRadius, sprite,
+        width, height, sceneY: sceneY + offsetY, radius: baseRadius, introY, introMaxRadius, sprite,
         handSources: introSources.map((points, side) => points.map(p => ({ ...p, ...transform(p, side) }))) as [HandSource[], HandSource[]],
         fingertips: [0, 1].map(side => {
           const hand = hands[side];
@@ -375,7 +381,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
       if (!faceReady || alpha <= 0) return;
       let frontTexture = face;
       if (mint < 1) {
-        if (Math.abs(mint - lastMint) > .002 || lastMint < 0) {
+      if (Math.abs(mint - lastMint) > .001 || lastMint < 0) {
           const m = mintedFace.getContext('2d');
           if (m) {
             m.clearRect(0, 0, 640, 640);
@@ -385,7 +391,8 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
             m.arc(320, 320, Math.max(.001, 280 * (1 - fill)), 0, Math.PI * 2, true); m.clip('evenodd');
             m.drawImage(blankFace, 0, 0); m.restore();
             const seal = smoothstep((mint - .66) / .34);
-            if (seal > 0) { m.save(); m.beginPath(); m.rect(0, 0, 640, 640 * seal); m.clip(); m.drawImage(face, 0, 0); m.restore(); }
+            // The relief emerges across the face as a pressed seal, not a wipe.
+            if (seal > 0) { m.save(); m.globalAlpha = seal; m.drawImage(face, 0, 0); m.restore(); }
           }
           lastMint = mint;
         }
@@ -451,10 +458,35 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
           if (!matrix) continue;
           ctx.save(); path(); ctx.clip(); ctx.transform(...matrix);
           ctx.drawImage(surface.texture, 0, 0); ctx.restore();
-          path(); ctx.fillStyle = 'rgba(27,17,8,' + surface.shade + ')'; ctx.fill();
         } else {
           path(); ctx.fillStyle = surface.fill || '#b78a4d'; ctx.fill();
         }
+      }
+      // Light the whole projected face once. Per-triangle translucent shading
+      // produces visible dark seams along an otherwise continuous surface.
+      for (const side of [1, -1]) {
+        if (!visibleFace(side, pose.angle, tilt)) continue;
+        ctx.save(); ctx.beginPath();
+        for (let i = 0; i <= segments; i++) {
+          const a = i / segments * Math.PI * 2;
+          const p = project(Math.cos(a), Math.sin(a), side * COIN_HALF_DEPTH).screen;
+          if (i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y);
+        }
+        ctx.closePath(); ctx.clip();
+        const normal = rotateCoin({ x: 0, y: 0, z: side }, pose.angle, tilt);
+        const light = clamp(normal.x * -.4 + normal.y * -.45 + normal.z * .8);
+        // Only shade a formed face; a half-minted coin remains an open ring.
+        ctx.globalAlpha = alpha * smoothstep((mint - .6) / .4);
+        ctx.fillStyle = 'rgba(29,20,12,' + (1 - light) * .28 + ')';
+        ctx.fillRect(pose.x - pose.radius * 1.3, pose.y - pose.radius * 1.3, pose.radius * 2.6, pose.radius * 2.6);
+        const sweep = Math.sin(pose.angle) * pose.radius * .85;
+        const reflection = ctx.createLinearGradient(pose.x - pose.radius + sweep, pose.y - pose.radius, pose.x + pose.radius + sweep, pose.y + pose.radius * .4);
+        reflection.addColorStop(0, 'transparent'); reflection.addColorStop(.34, 'transparent');
+        reflection.addColorStop(.46, 'rgba(255,240,207,.03)'); reflection.addColorStop(.53, 'rgba(255,240,207,' + (.29 + hover * .11) + ')');
+        reflection.addColorStop(.6, 'rgba(255,240,207,.06)'); reflection.addColorStop(.77, 'transparent');
+        ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = reflection;
+        ctx.fillRect(pose.x - pose.radius * 1.3, pose.y - pose.radius * 1.3, pose.radius * 2.6, pose.radius * 2.6);
+        ctx.restore();
       }
       ctx.restore();
     };
@@ -463,14 +495,15 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
       if (disposed) return;
       frame = requestAnimationFrame(render);
       if (document.hidden || !visible) { last = time; return; }
-      if (time - last < 1000 / 60) return;
-      const delta = Math.min((time - last) / 1000, .04); last = time;
+      const clockDelta = last ? Math.max(0, (time - last) / 1000) : 0;
+      const delta = Math.min(clockDelta, .04); last = time;
       const moving = options.current.animate;
+      if (!moving && staticRendered) return;
+      staticRendered = !moving;
       if (!moving || options.current.skipIntro) { intro = Math.max(intro, endTime); finish(); }
       if (moving) {
-        elapsed += delta;
-        if (loaded && fontsReady) intro += delta;
-        angle = advanceCoinAngle(angle, delta);
+        elapsed += clockDelta;
+        if (loaded && fontsReady) intro += clockDelta;
       }
       if (intro >= (definition?.releaseAt ?? 3.45)) finish();
       ctx.fillStyle = INK; ctx.fillRect(0, 0, width, height);
@@ -527,16 +560,17 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
         }
       }
 
-      if (revealHands > 0) drawHands(revealHands, delta, moving, shot?.handLight ?? 1);
-      if (experiment && shot && intro < endTime) experiment.draw(ctx, intro, introEnvironment(revealHands), shot);
+      const handOffset = definition?.id === 'hands' ? coinY - sceneY : 0;
+      if (revealHands > 0) { ctx.save(); ctx.translate(0, handOffset); drawHands(revealHands, delta, moving, shot?.handLight ?? 1); ctx.restore(); }
+      if (experiment && shot && intro < endTime) experiment.draw(ctx, intro, introEnvironment(revealHands, handOffset), shot);
       // A quiet halo is local to the focal object, never a full-page decorative wash.
       if (coinAlpha > 0) {
         const glowRadius = coinRadius * (2 + hover * .4);
         const glow = ctx.createRadialGradient(width / 2, coinY, 0, width / 2, coinY, glowRadius);
         glow.addColorStop(0, 'rgba(193,136,64,' + coinAlpha * (.085 + hover * .06) + ')'); glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow; ctx.fillRect(width / 2 - glowRadius, coinY - glowRadius, glowRadius * 2, glowRadius * 2);
-        const coinAngle = !moving && elapsed === 0 ? -.22 : shot?.angle ?? mix(-.3, angle, smoothstep((intro - 2.15) / 1));
-        drawCoin({ x: width / 2, y: coinY - hover * 8 + Math.sin(elapsed * .85) * 3 * transfer, radius: coinRadius * (1 + hover * .08), angle: coinAngle }, coinAlpha, shot?.mint ?? 1);
+        const coinAngle = !moving && elapsed === 0 ? -.22 : shot?.angle ?? spinAngle(intro, 2.5);
+        drawCoin({ x: width / 2, y: coinY - hover * 5 + Math.sin(elapsed * .85) * 2.5 * transfer, radius: coinRadius * (1 + hover * .055), angle: coinAngle }, coinAlpha, shot?.mint ?? 1);
       }
     };
 
@@ -553,10 +587,13 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
     document.fonts.ready.then(() => { if (!disposed) { fontsReady = true; resize(); } });
     const observer = new ResizeObserver(resize); observer.observe(canvas);
     const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }); intersection.observe(canvas);
+    const resetClock = () => { last = 0; };
+    document.addEventListener('visibilitychange', resetClock);
     resize(); frame = requestAnimationFrame(render);
     return () => {
       disposed = true; cancelAnimationFrame(frame); clearTimeout(fallback); handEffects?.clear();
       observer.disconnect(); intersection.disconnect(); source.onload = null; source.onerror = null; logo.onload = null;
+      document.removeEventListener('visibilitychange', resetClock);
     };
   }, [definition]);
 

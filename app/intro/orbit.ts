@@ -1,4 +1,4 @@
-import { clamp, ease, enter, mix, phase, seeded, spinAngle, TAU } from './motion';
+import { clamp, glide, enter, mix, phase, projectedRim, seeded, spinAngle, TAU } from './motion';
 import type { IntroDefinition, IntroEnvironment, IntroFrame } from './types';
 
 const SYMBOLS = ['$', '€', '£', '¥', '₺', '₹'];
@@ -7,8 +7,8 @@ type Grain = { x: number; y: number; group: number; seed: number };
 export function orbitFrame(t: number, e: IntroEnvironment): IntroFrame {
   const transfer = phase(t, 3.45, 1.3);
   return {
-    coinY: mix(e.height * .4, e.sceneY, transfer),
-    coinRadius: mix(e.radius * (e.width < 760 ? 1.85 : 2.05), e.radius, transfer),
+    coinY: mix(e.introY ?? e.height * .4, e.sceneY, transfer),
+    coinRadius: mix(Math.min(e.introMaxRadius ?? Infinity, e.radius * (e.width < 760 ? 1.85 : 2.05)), e.radius, transfer),
     coinAlpha: phase(t, 2.22, .4), mint: phase(t, 2.25, 1.12),
     angle: spinAngle(t, 3.08), hands: phase(t, 3.35, 1.4),
     handLight: phase(t, 3.4, .85), transfer,
@@ -48,7 +48,7 @@ export const orbitIntro: IntroDefinition = {
       const depth = Math.sin(a + .7), perspective = 1 + depth * .14;
       return {
         x: e.width / 2 + Math.cos(a) * e.width * .31,
-        y: e.height * .4 + Math.sin(a) * Math.min(e.height * .19, 195),
+        y: (e.introY ?? e.height * .4) + Math.sin(a) * Math.min(e.height * .16, e.introMaxRadius ?? 175),
         size: clamp(e.width * .164, 90, 218) * perspective,
         rotation: Math.cos(a) * .2 + t * .025,
         depth,
@@ -58,8 +58,8 @@ export const orbitIntro: IntroDefinition = {
       frame: orbitFrame,
       draw(ctx, t, e, f) {
         prepare(e);
-        const centerX = e.width / 2, centerY = e.height * .4;
-        const largeRadius = e.radius * (e.width < 760 ? 1.85 : 2.05);
+        const centerX = e.width / 2, centerY = e.introY ?? e.height * .4;
+        const largeRadius = Math.min(e.introMaxRadius ?? Infinity, e.radius * (e.width < 760 ? 1.85 : 2.05));
         // Order whole glyphs by depth before they shed their engraved material.
         const order = SYMBOLS.map((_, i) => i).sort((a, b) => placement(a, t, e).depth - placement(b, t, e).depth);
         for (const i of order) {
@@ -75,18 +75,20 @@ export const orbitIntro: IntroDefinition = {
           ctx.save(); ctx.globalCompositeOperation = 'screen';
           for (const p of grains) {
             const start = 1.04 + p.group * .035;
-            const gather = ease((t - start - p.seed * .12) / 1.55);
-            const home = placement(p.group, Math.min(t, start + .2), e);
+            const gather = glide((t - start - p.seed * .12) / 1.72);
+            const home = placement(p.group, start + .32 * (1 - Math.exp(-Math.max(0, t - start) / .32)), e);
             const x = home.x + (p.x * Math.cos(home.rotation) - p.y * Math.sin(home.rotation)) * home.size;
             const y = home.y + (p.x * Math.sin(home.rotation) + p.y * Math.cos(home.rotation)) * home.size;
             const a = Math.atan2(y - centerY, x - centerX);
             const travel = a + TAU * (.72 + p.seed * .14) * gather;
             const startRadius = Math.hypot(x - centerX, y - centerY);
-            const land = largeRadius * (.96 + p.seed * .04);
+            const land = largeRadius * (.93 + p.seed * .055);
             const radius = mix(startRadius, land, gather);
-            const px = centerX + Math.cos(travel) * radius;
-            const py = centerY + Math.sin(travel) * radius;
-            const alpha = phase(t, start, .35) * (1 - phase(t, 2.7 + p.seed * .2, .45));
+            const rim = projectedRim(travel, land, f.angle);
+            const dock = phase(gather, .72, .28);
+            const px = centerX + mix(Math.cos(travel) * radius, rim.x, dock);
+            const py = mix(centerY + Math.sin(travel) * radius, f.coinY + rim.y, dock);
+            const alpha = phase(t, start, .35) * (1 - phase(gather, .79, .21));
             const size = mix(home.size / 52 * 1.5, 3.1, gather);
             ctx.globalAlpha = alpha * (.45 + p.seed * .5);
             ctx.drawImage(e.sprite, p.group * 16, 0, 16, 16, px - size / 2, py - size / 2, size, size);
@@ -98,7 +100,9 @@ export const orbitIntro: IntroDefinition = {
         if (glint > 0) {
           const a = (t - 2.3) * 3.4;
           ctx.save(); ctx.globalAlpha = glint * .6; ctx.strokeStyle = '#ffe7bd'; ctx.lineWidth = 1.25;
-          ctx.beginPath(); ctx.arc(centerX, f.coinY, f.coinRadius * 1.025, a, a + .5); ctx.stroke(); ctx.restore();
+          ctx.beginPath();
+          for (let i = 0; i <= 20; i++) { const p = projectedRim(a + i / 20 * .5, f.coinRadius, f.angle); if (i) ctx.lineTo(centerX + p.x, f.coinY + p.y); else ctx.moveTo(centerX + p.x, f.coinY + p.y); }
+          ctx.stroke(); ctx.restore();
         }
       },
     };
