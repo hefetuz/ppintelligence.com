@@ -7,6 +7,7 @@ import HeroArt from './hero-art';
 import { DEFAULT_INTRO, findIntro, INTRO_DEFINITIONS } from './intro/registry';
 import type { IntroId } from './intro/types';
 import { HAND_DIRECTIONS } from './hand-motion';
+import ArtCursor from './art-cursor';
 
 const BOOKING_URL = 'https://calendly.com/dtudor-prettypennyintelligence/introductory-meeting';
 
@@ -30,7 +31,11 @@ export default function Home() {
     const requested = query.get('intro');
     setIntroId(requested === 'original' ? 'original' : findIntro(requested)?.id ?? DEFAULT_INTRO);
     setCompare(query.get('compare') === '1');
-    if (query.get('scene') === '1') { setSkipIntro(true); setIntro(false); }
+    // Old review links used scene=1. They must no longer silently skip the opening.
+    if (query.has('scene')) {
+      query.delete('scene');
+      window.history.replaceState(null, '', window.location.pathname + '?' + query.toString());
+    }
     setConfigured(true);
     return () => media.removeEventListener('change', sync);
   }, []);
@@ -39,19 +44,20 @@ export default function Home() {
   };
   const selectIntro = (id: IntroId) => {
     const url = new URL(window.location.href);
-    const sceneOnly = url.searchParams.get('scene') === '1';
-    setIntroId(id); setSkipIntro(sceneOnly); setIntro(!sceneOnly); setReplay(value => value + 1);
+    setIntroId(id); setSkipIntro(false); setIntro(true); setReplay(value => value + 1);
+    url.searchParams.delete('scene');
     url.searchParams.set('intro', id); url.searchParams.set('compare', '1');
     window.history.replaceState(null, '', url);
   };
   return <>
+    <ArtCursor />
     {compare && <aside className="intro-lab" aria-label="Üç görsel yönü ve el etkileşimini karşılaştır">
-      <span className="lab-label">Görsel denemeler</span>
+      <span className="lab-label">Pretty Penny <span>Art direction / 03</span></span>
       <div className="lab-options">{INTRO_DEFINITIONS.map((item, index) => <Button key={item.id} variant="ghost" className="lab-choice" aria-pressed={introId === item.id} onClick={() => selectIntro(item.id)} title={item.description + ' — ' + HAND_DIRECTIONS[item.id].name}><span className="lab-number">0{index + 1}</span>{item.shortTitle}</Button>)}</div>
       <Button variant="ghost" className="lab-replay" onClick={replayIntro} aria-label="Seçili animasyonu tekrar oynat"><RotateCcw size={15} /><span>Tekrar</span></Button>
       <a className="lab-close" href="/" aria-label="Karşılaştırmayı kapat, mevcut sürüme dön">Kapat <span aria-hidden="true">×</span></a>
     </aside>}
-    <main className={'hero ' + (intro ? 'intro-running' : 'scene-ready') + (animate ? '' : ' motion-paused')}>
+    <main data-direction={introId} className={'hero ' + (intro ? 'intro-running' : 'scene-ready') + (animate ? '' : ' motion-paused')}>
     <div className="artwork">{configured && <HeroArt key={introId + replay} animate={animate} skipIntro={skipIntro} onIntroComplete={finishIntro} definition={definition} />}</div>
     <header className="hero-header">
       <a className="identity" href="/" aria-label="Pretty Penny Intelligence home">
@@ -90,6 +96,7 @@ export default function Home() {
     </footer>
     <div className="intro-caption" aria-hidden={!intro} inert={!intro}>
       <span className="intro-label">Pretty Penny Intelligence</span>
+      <span className="intro-rule" style={{ animationDuration: (definition?.releaseAt ?? 3.45) + 's' }} key={introId + replay} />
       <p>{definition?.caption ?? 'Possibility, taking shape.'}</p>
       <Button className="skip-intro" variant="ghost" onClick={() => { setSkipIntro(true); setIntro(false); }}>Skip intro <ArrowUpRight size={15} /></Button>
     </div>

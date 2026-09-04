@@ -21,11 +21,11 @@ The introduction is a short brand sequence, not a fabricated loading percentage.
 1. 0–1.0s: six large currency symbols drift in a broad elliptical arrangement.
 2. 0.8–2.6s: their silhouettes turn into currency particles and converge into a single coin.
 3. 2.5–3.8s: that same coin travels to its resting place; the two hands arrive from the sides.
-4. 3.45s: editorial copy and actions reveal with a 40ms stagger, 12px rise and 3px blur over 500ms.
+4. The selected introduction hands off into an editorial text reveal: 55ms stagger, 18px rise, no blur, 720ms easing.
 
-Idle hands use restrained wrist-pivot transforms. The supplied full-resolution image now provides the continuous sculptural surface, with currency engraving as a secondary layer. Local pointer exploration lifts a patch of currency symbols within a 72–112px field using a damped spring (stiffness 125, damping 21). Only that small patch partially dissolves; the hand's overall anatomy stays intact. Touch release lets it return. Coin-tinted light is clipped to the fingers.
+Idle hands use restrained wrist-pivot transforms. The new full-resolution sculpture provides a continuous surface, with currency engraving as a secondary layer. A local 12×12 mesh deforms the actual material at the supplied cursor's fingertip. Three bounded treatments explore torsion, liquid refraction and soft pressure. No currency detaches during hover. Coin-tinted light is clipped to the fingers.
 
-The coin uses signed 3D vertex rotation, perspective projection, back-face culling, a reeded cylinder edge and separate front/reverse textures. It turns continuously every eight seconds at constant speed; hover adds an 8px lift and 8% scale without changing rotational direction or speed. Five geometry tests check monotonic rotation, exact loop closure, face selection, perspective and texture mapping. Intro skip, replay, pause, touch, keyboard and reduced-motion behavior are preserved. Offscreen/hidden rendering pauses. Font/image failure cannot block access to the page.
+The coin uses signed 3D vertex rotation, perspective projection, back-face culling, a reeded edge, separate front/reverse textures and view-space metallic reflection. It turns continuously every eight seconds; hover adds a 5px lift and 5.5% scale without reversing. Every animation frame is used; intro completion clears the fallback timer to prevent an 8.5-second rewind. Intro skip, replay, pause, touch, keyboard and reduced-motion remain available. Background visibility changes reset the frame clock. Static reduced-motion scenes stop repainting after completion.
 
 ## References
 

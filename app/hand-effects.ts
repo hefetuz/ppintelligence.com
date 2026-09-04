@@ -1,4 +1,5 @@
-import { advanceHandSpring, clamp, handField, HAND_DIRECTIONS, smooth, surfaceWarp, type HandDirection, type SpringPoint } from './hand-motion';
+import { clamp, HAND_DIRECTIONS, touchWarp, type HandDirection, type SpringPoint } from './hand-motion';
+import { triangleTransform, type Point2 } from './coin-geometry';
 
 export type SurfaceGrain = SpringPoint & { x: number; y: number; symbol: number; seed: number; tone: number };
 export type HandPose = { pivot: number; dx: number; dy: number; rotation: number };
@@ -10,155 +11,114 @@ type Input = {
   pointer: { x: number; y: number; active: boolean; keyboard: boolean };
   interactive: boolean; moving: boolean; reveal: number;
 };
-type WorldGrain = { point: SurfaceGrain; x: number; y: number; side: number };
 
 export function createHandEffects(direction: HandDirection) {
   const profile = HAND_DIRECTIONS[direction];
-  const patch = document.createElement('canvas'), light = document.createElement('canvas');
-  const patchCtx = patch.getContext('2d'), lightCtx = light.getContext('2d');
-  let x = -1000, y = -1000, strength = 0, field = 150, patchDpr = 1, patchSize = 0;
-  let handWeights = [0, 0], world: WorldGrain[] = [], lastHands: EffectHand[] | undefined;
-  const resize = (i: Input) => {
-    field = Math.min(profile.field, Math.max(108, i.width * .19));
-    const size = Math.ceil(field * 2 + 12);
-    if (size !== patchSize || patchDpr !== i.dpr) {
-      patchSize = size; patchDpr = i.dpr;
-      patch.width = light.width = Math.ceil(size * i.dpr);
-      patch.height = light.height = Math.ceil(size * i.dpr);
+  const patch = document.createElement('canvas'), sample = document.createElement('canvas');
+  const c = patch.getContext('2d'), s = sample.getContext('2d');
+  let x = -1000, y = -1000, strength = 0, field = 120, size = 0, dpr = 1;
+  let dragX = 0, dragY = 0;
+  let handWeights = [0, 0];
+
+  const deform = (i: Input) => {
+    if (!c || !s) return;
+    const half = size / 2, left = x - half, top = y - half;
+    s.setTransform(dpr, 0, 0, dpr, 0, 0);
+    s.globalCompositeOperation = 'source-over'; s.globalAlpha = 1;
+    s.clearRect(0, 0, size, size);
+    s.drawImage(i.material, left * dpr, top * dpr, size * dpr, size * dpr, 0, 0, size, size);
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, size, size);
+    const cells = 12, step = size / cells;
+    const vertices: Point2[] = [];
+    for (let row = 0; row <= cells; row++) for (let col = 0; col <= cells; col++) {
+      const px = col * step, py = row * step;
+      const warp = touchWarp(direction, px - half, py - half, field, i.time, strength, { x: dragX, y: dragY });
+      vertices.push({ x: px + warp.x, y: py + warp.y });
     }
-    if (lastHands !== i.hands) {
-      lastHands = i.hands;
-      world = i.hands.flatMap(hand => hand.points.map(point => ({ point, x: 0, y: 0, side: hand.side })));
+    const triangle = (source: Point2[], target: Point2[], sx: number, sy: number) => {
+      const matrix = triangleTransform(source, target);
+      if (!matrix) return;
+      c.save(); c.beginPath();
+      const cx = (target[0].x + target[1].x + target[2].x) / 3;
+      const cy = (target[0].y + target[1].y + target[2].y) / 3;
+      target.forEach((p, n) => {
+        const distance = Math.max(1, Math.hypot(p.x - cx, p.y - cy));
+        const px = p.x + (p.x - cx) / distance * .4;
+        const py = p.y + (p.y - cy) / distance * .4;
+        if (n) c.lineTo(px, py); else c.moveTo(px, py);
+      });
+      c.closePath(); c.clip(); c.transform(...matrix);
+      // Crop each cell before mapping; no full-screen redraw per mesh face.
+      c.drawImage(sample, (sx - .75) * dpr, (sy - .75) * dpr, (step + 1.5) * dpr, (step + 1.5) * dpr, sx - .75, sy - .75, step + 1.5, step + 1.5);
+      c.restore();
+    };
+    for (let row = 0; row < cells; row++) for (let col = 0; col < cells; col++) {
+      const sx = col * step, sy = row * step, n = row * (cells + 1) + col;
+      const a = { x: sx, y: sy }, b = { x: sx + step, y: sy }, d = { x: sx, y: sy + step }, e = { x: sx + step, y: sy + step };
+      triangle([a, b, e], [vertices[n], vertices[n + 1], vertices[n + cells + 2]], sx, sy);
+      triangle([a, e, d], [vertices[n], vertices[n + cells + 2], vertices[n + cells + 1]], sx, sy);
     }
-  };
-  const mask = (c: CanvasRenderingContext2D, inner = .42) => {
-    c.globalCompositeOperation = 'destination-in';
-    const gradient = c.createRadialGradient(patchSize / 2, patchSize / 2, field * inner, patchSize / 2, patchSize / 2, field);
-    gradient.addColorStop(0, '#fff'); gradient.addColorStop(1, 'transparent');
-    c.fillStyle = gradient; c.fillRect(0, 0, patchSize, patchSize); c.globalCompositeOperation = 'source-over';
-  };
-  const extract = (c: CanvasRenderingContext2D, i: Input) => {
-    c.setTransform(i.dpr, 0, 0, i.dpr, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
-    c.clearRect(0, 0, patchSize, patchSize);
-    c.drawImage(i.material, (x - patchSize / 2) * i.dpr, (y - patchSize / 2) * i.dpr, patchSize * i.dpr, patchSize * i.dpr, 0, 0, patchSize, patchSize);
-  };
-  const paintLight = (i: Input) => {
-    if (!lightCtx || strength < .002) return;
-    const c = lightCtx, half = patchSize / 2;
-    extract(c, i);
-    c.globalCompositeOperation = 'source-in';
-    if (direction === 'morph') {
-      // A broad moving studio strip, not a circular cursor lamp.
-      const sweep = Math.sin(i.time * .7) * field * .13;
-      const metal = c.createLinearGradient(half - field + sweep, 0, half + field + sweep, patchSize);
-      metal.addColorStop(0, 'transparent'); metal.addColorStop(.26, 'rgba(167,194,218,.03)');
-      metal.addColorStop(.45, 'rgba(222,234,242,.78)'); metal.addColorStop(.51, 'rgba(255,241,208,.85)');
-      metal.addColorStop(.6, 'rgba(178,196,214,.04)'); metal.addColorStop(1, 'transparent');
-      c.fillStyle = metal;
-    } else {
-      const gradient = c.createRadialGradient(half, half, field * .05, half, half, field);
-      gradient.addColorStop(0, direction === 'orbit' ? 'rgba(184,212,235,.7)' : 'rgba(239,192,117,.65)');
-      gradient.addColorStop(.48, direction === 'orbit' ? 'rgba(219,179,121,.25)' : 'rgba(231,169,91,.25)');
-      gradient.addColorStop(1, 'transparent'); c.fillStyle = gradient;
-    }
-    c.fillRect(0, 0, patchSize, patchSize); mask(c);
-    i.ctx.save(); i.ctx.globalCompositeOperation = 'screen'; i.ctx.globalAlpha = strength;
-    i.ctx.drawImage(light, x - half, y - half, patchSize, patchSize); i.ctx.restore();
-  };
-  const paintLiquid = (i: Input) => {
-    if (!patchCtx || strength < .002) return;
-    const c = patchCtx, half = patchSize / 2;
-    c.setTransform(i.dpr, 0, 0, i.dpr, 0, 0); c.clearRect(0, 0, patchSize, patchSize);
-    // Narrow overlapping strips refract the real material, retaining its details.
-    // The radial envelope reaches zero at the boundary; no hard lens edge.
-    const step = 3;
-    for (let row = 0; row < patchSize; row += step) {
-      const dy = row - half;
-      const warp = surfaceWarp(0, dy, field, i.time, strength);
-      const stretch = 1 + Math.sin(dy / 41 + i.time * 1.1) * .065 * smooth(1 - Math.abs(dy) / field) * strength;
-      const destinationWidth = patchSize * stretch;
-      c.drawImage(i.material,
-        (x - half) * i.dpr, (y - half + row) * i.dpr, patchSize * i.dpr, (step + 1) * i.dpr,
-        (patchSize - destinationWidth) / 2 + warp.x, row + warp.y, destinationWidth, step + 1.5);
-    }
-    mask(c, .25);
-    const cover = i.ctx.createRadialGradient(x, y, field * .2, x, y, field);
-    cover.addColorStop(0, 'rgba(9,11,13,' + strength * .92 + ')'); cover.addColorStop(1, 'transparent');
-    i.ctx.fillStyle = cover; i.ctx.fillRect(x - field, y - field, field * 2, field * 2);
-    i.ctx.save(); i.ctx.globalAlpha = strength; i.ctx.drawImage(patch, x - half, y - half, patchSize, patchSize); i.ctx.restore();
+    // Replace the region, avoiding a ghosted duplicate of the original hand.
+    i.ctx.save(); i.ctx.beginPath(); i.ctx.rect(0, 0, i.width, i.height);
+    i.ctx.rect(left, top, size, size); i.ctx.clip('evenodd');
+    i.ctx.drawImage(i.material, 0, 0, i.width, i.height); i.ctx.restore();
+    i.ctx.drawImage(patch, left, top, size, size);
+
+    // A studio reflection is clipped to the deformed material's actual alpha.
+    s.clearRect(0, 0, size, size); s.drawImage(patch, 0, 0, size, size);
+    s.globalCompositeOperation = 'source-in';
+    const shift = Math.sin(i.time * .8) * field * .16;
+    const light = s.createLinearGradient(shift, 0, size + shift, size * .55);
+    const tint = direction === 'hands' ? '245,208,156' : '225,237,245';
+    light.addColorStop(0, 'transparent'); light.addColorStop(.35, 'transparent');
+    light.addColorStop(.49, `rgba(${tint},.5)`); light.addColorStop(.58, `rgba(${tint},.08)`); light.addColorStop(.8, 'transparent');
+    s.fillStyle = light; s.fillRect(0, 0, size, size);
+    s.globalCompositeOperation = 'destination-in';
+    const falloff = s.createRadialGradient(half, half, field * .1, half, half, field);
+    falloff.addColorStop(0, '#fff'); falloff.addColorStop(1, 'transparent');
+    s.fillStyle = falloff; s.fillRect(0, 0, size, size);
+    s.globalCompositeOperation = 'source-over';
+    i.ctx.save(); i.ctx.globalCompositeOperation = 'screen'; i.ctx.globalAlpha = strength * .52;
+    i.ctx.drawImage(sample, left, top, size, size); i.ctx.restore();
   };
 
   return {
     pose(side: number) {
       const weight = handWeights[side], toward = side ? -1 : 1;
-      return {
-        dx: toward * weight * (direction === 'hands' ? 11 : direction === 'morph' ? 6 : 3),
-        dy: -weight * (direction === 'orbit' ? 9 : 5),
-        rotation: toward * weight * (direction === 'morph' ? .013 : .008),
-      };
+      return { dx: toward * weight * (direction === 'hands' ? 5 : 3), dy: -weight * 2.5, rotation: toward * weight * .003 };
     },
     render(i: Input) {
-      resize(i);
+      field = Math.min(profile.field, Math.max(88, i.width * .18));
+      const nextSize = Math.ceil(field * 2 + 8);
+      if (size !== nextSize || dpr !== i.dpr) {
+        size = nextSize; dpr = i.dpr;
+        patch.width = sample.width = Math.ceil(size * dpr);
+        patch.height = sample.height = Math.ceil(size * dpr);
+      }
       const nearest = [Infinity, Infinity];
-      for (const grain of world) {
-        const hand = i.hands[grain.side], pose = i.poses[grain.side], p = grain.point;
-        const c = Math.cos(pose.rotation), s = Math.sin(pose.rotation);
-        const lx = hand.x + p.x - pose.pivot, ly = hand.y + p.y - i.sceneY;
-        grain.x = pose.pivot + pose.dx + lx * c - ly * s;
-        grain.y = i.sceneY + pose.dy + lx * s + ly * c;
-        nearest[grain.side] = Math.min(nearest[grain.side], Math.hypot(grain.x - i.pointer.x, grain.y - i.pointer.y));
+      if (i.pointer.active && i.interactive) for (const hand of i.hands) {
+        const pose = i.poses[hand.side], co = Math.cos(pose.rotation), si = Math.sin(pose.rotation);
+        for (const p of hand.points) {
+          const lx = hand.x + p.x - pose.pivot, ly = hand.y + p.y - i.sceneY;
+          const px = pose.pivot + pose.dx + lx * co - ly * si;
+          const py = i.sceneY + pose.dy + lx * si + ly * co;
+          nearest[hand.side] = Math.min(nearest[hand.side], (px - i.pointer.x) ** 2 + (py - i.pointer.y) ** 2);
+        }
       }
-      const hit = i.pointer.active && i.interactive && Math.min(...nearest) < 22;
+      const hit = i.pointer.active && i.interactive && Math.min(...nearest) < 400;
       if (i.moving) {
-        if (strength < .006 && hit) { x = i.pointer.x; y = i.pointer.y; }
-        const follow = i.pointer.keyboard ? 1 : 1 - Math.exp(-i.delta * 12);
-        // Hold the last interaction origin during the graceful return.
-        if (i.pointer.active) { x += (i.pointer.x - x) * follow; y += (i.pointer.y - y) * follow; }
-        strength += ((hit ? 1 : 0) - strength) * (1 - Math.exp(-i.delta * (hit ? 12 : 5.5)));
-        handWeights = handWeights.map((weight, side) => weight + ((hit && nearest[side] < 22 ? 1 : 0) - weight) * (1 - Math.exp(-i.delta * 7)));
+        const follow = 1 - Math.exp(-i.delta * 14);
+        if (strength < .004 && hit) { x = i.pointer.x; y = i.pointer.y; }
+        const dx = i.pointer.active ? clamp((i.pointer.x - x) / Math.max(i.delta, .004) * .05, -48, 48) : 0;
+        const dy = i.pointer.active ? clamp((i.pointer.y - y) / Math.max(i.delta, .004) * .05, -48, 48) : 0;
+        dragX += (dx - dragX) * follow; dragY += (dy - dragY) * follow;
+        if (i.pointer.active) { x = i.pointer.x; y = i.pointer.y; }
+        strength += ((hit ? 1 : 0) - strength) * (1 - Math.exp(-i.delta * (hit ? 10 : 6)));
+        handWeights = handWeights.map((weight, side) => weight + ((hit && nearest[side] < 400 ? 1 : 0) - weight) * follow);
       }
-      i.ctx.drawImage(i.material, 0, 0, i.width, i.height);
-      if (direction === 'morph') {
-        paintLiquid(i); paintLight(i);
-        return;
-      }
-      paintLight(i);
-      if (strength > .002) {
-        // Remove the solid surface softly; its currency engraving lifts with it.
-        const cavity = i.ctx.createRadialGradient(x, y, 0, x, y, field * .94);
-        cavity.addColorStop(0, 'rgba(9,11,13,' + strength * profile.opacity + ')');
-        cavity.addColorStop(.4, 'rgba(9,11,13,' + strength * profile.opacity * .65 + ')'); cavity.addColorStop(1, 'transparent');
-        i.ctx.fillStyle = cavity; i.ctx.fillRect(x - field, y - field, field * 2, field * 2);
-      }
-      const drawGrain = (grain: WorldGrain, front: boolean) => {
-        const p = grain.point;
-        const target = handField(direction, { x: grain.x, y: grain.y, cx: x, cy: y, radius: field, time: i.time, seed: p.seed, side: grain.side, strength });
-        if (target.weight < .001 && p.energy < .001 && Math.abs(p.offsetX) + Math.abs(p.offsetY) < .05) return;
-        if (!front && i.moving) advanceHandSpring(p, target, i.delta, direction);
-        if (p.energy < .002 && Math.abs(p.offsetX) + Math.abs(p.offsetY) < .1) return;
-        if ((target.depth >= .5) !== front) return;
-        const alpha = clamp(p.energy * 1.45) * (.45 + p.tone * .55) * smooth(i.reveal);
-        const size = direction === 'orbit' ? 3.4 + target.depth * 5 + p.energy * 2 : 4.3 + p.energy * 4;
-        const px = grain.x + p.offsetX, py = grain.y + p.offsetY;
-        if (direction === 'hands' && p.seed > .79 && p.energy > .15) {
-          i.ctx.globalAlpha = alpha * .24; i.ctx.strokeStyle = '#d9b47f'; i.ctx.lineWidth = .65;
-          i.ctx.beginPath(); i.ctx.moveTo(grain.x, grain.y);
-          i.ctx.quadraticCurveTo(grain.x + p.offsetX * .3, grain.y - 24 * p.energy, px, py); i.ctx.stroke();
-        }
-        if (direction === 'orbit' && p.seed > .76) {
-          i.ctx.save(); i.ctx.globalAlpha = alpha; i.ctx.translate(px, py); i.ctx.rotate(i.time * .75 + p.seed * 7);
-          i.ctx.fillStyle = target.depth > .65 ? '#edd3a8' : '#adb9c2'; i.ctx.fillRect(-size * .18, -size * .5, size * .36, size); i.ctx.restore();
-        } else {
-          i.ctx.globalAlpha = alpha;
-          const row = direction === 'orbit' && target.depth < .6 ? 16 : 0;
-          i.ctx.drawImage(i.sprite, p.symbol * 16, row, 16, 16, px - size / 2, py - size / 2, size, size);
-        }
-      };
-      // Back/front passes give the lifted material a true depth hierarchy.
-      for (const grain of world) drawGrain(grain, false);
-      for (const grain of world) drawGrain(grain, true);
-      i.ctx.globalAlpha = 1;
+      if (strength < .003 || !c || !s) i.ctx.drawImage(i.material, 0, 0, i.width, i.height);
+      else deform(i);
     },
-    clear() { patch.width = patch.height = light.width = light.height = 1; world = []; lastHands = undefined; },
+    clear() { patch.width = patch.height = sample.width = sample.height = 1; },
   };
 }
