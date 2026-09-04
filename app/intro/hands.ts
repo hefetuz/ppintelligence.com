@@ -1,22 +1,23 @@
-import { bezier, clamp, enter, mix, phase, spinAngle, TAU } from './motion';
+import { bezier, clamp, enter, glide, mix, phase, projectedRim, spinAngle, TAU } from './motion';
 import type { HandSource, IntroDefinition, IntroEnvironment, IntroFrame, Point } from './types';
 
 export function handsFrame(t: number, e: IntroEnvironment): IntroFrame {
   const transfer = phase(t, 3.25, 1.25);
   return {
-    // Here the hands are the origin: the coin is born at its final position.
-    coinY: e.sceneY, coinRadius: mix(e.radius * 1.36, e.radius, transfer),
+    // Both hands frame the birth; the whole scene settles into the final layout.
+    coinY: mix(e.introY ?? e.sceneY, e.sceneY, transfer), coinRadius: mix(Math.min(e.introMaxRadius ?? Infinity, e.radius * 1.36), e.radius, transfer),
     coinAlpha: phase(t, 1.95, .55), mint: phase(t, 2.02, 1.35),
     angle: spinAngle(t, 3.04), hands: mix(.38, 1, phase(t, .1, 1.15)),
     handLight: phase(t, 1.6, 2.05), transfer,
   };
 }
 
-function streamPoint(p: HandSource, tip: Point, side: number, progress: number, e: IntroEnvironment, radius: number) {
+function streamPoint(p: HandSource, tip: Point, side: number, progress: number, e: IntroEnvironment, radius: number, angle: number) {
   const direction = side ? -1 : 1;
   const theta = p.seed * TAU * .68 + (side ? 0 : Math.PI);
-  const endX = e.width / 2 + Math.cos(theta) * radius * .97;
-  const endY = e.sceneY + Math.sin(theta) * radius * .97;
+  const rim = projectedRim(theta, radius * .98, angle);
+  const endX = e.width / 2 + rim.x;
+  const endY = e.sceneY + rim.y;
   return {
     x: bezier(p.x, mix(p.x, tip.x, .66), tip.x + direction * radius * .6, endX, progress),
     y: bezier(p.y, p.y - 36 - p.seed * 28, tip.y - 48 + p.seed * 54, endY, progress),
@@ -33,7 +34,7 @@ export const handsIntro: IntroDefinition = {
       frame: handsFrame,
       draw(ctx, t, e, f) {
         if (t >= 4.1) return;
-        const birthRadius = e.radius * 1.36;
+        const birthRadius = Math.min(e.introMaxRadius ?? Infinity, e.radius * 1.36);
         ctx.save(); ctx.globalCompositeOperation = 'screen';
         for (const side of [0, 1]) {
           const tip = e.fingertips[side];
@@ -48,13 +49,13 @@ export const handsIntro: IntroDefinition = {
             if (p.x < 12 || p.x > e.width - 12) continue;
             const start = .4 + p.seed * 1.15;
             const travelTime = 1.2 + p.seed * .38;
-            const progress = clamp((t - start) / travelTime);
+            const progress = glide((t - start) / travelTime);
             if (t < start || t > start + travelTime + .75) continue;
-            const alpha = enter((t - start) / .3) * (1 - phase(t, start + travelTime + .05, .6));
-            const head = streamPoint(p, tip, side, progress, e, birthRadius);
+            const alpha = enter((t - start) / .3) * (1 - phase(progress, .82, .18));
+            const head = streamPoint(p, tip, side, progress, e, birthRadius, f.angle);
             // Two short echoes give direction without a persistent smoke cloud.
             for (let trail = 2; trail >= 0; trail--) {
-              const q = trail ? streamPoint(p, tip, side, clamp(progress - trail * .022), e, birthRadius) : head;
+              const q = trail ? streamPoint(p, tip, side, clamp(progress - trail * .022), e, birthRadius, f.angle) : head;
               const size = mix(5.2, 9.4, Math.sin(progress * Math.PI)) * (e.width < 760 ? .86 : 1);
               ctx.globalAlpha = alpha * (trail ? .09 : .48 + p.tone * .35);
               ctx.drawImage(e.sprite, p.symbol * 16, 0, 16, 16, q.x - size / 2, q.y - size / 2, size, size);
@@ -68,8 +69,9 @@ export const handsIntro: IntroDefinition = {
           for (let i = 0; i < 72; i++) {
             const a = i / 72 * TAU + t * .2;
             const radius = f.coinRadius * (1 + Math.sin(i * 2.3 + t) * .014);
-            const x = e.width / 2 + Math.cos(a) * radius;
-            const y = e.sceneY + Math.sin(a) * radius;
+            const p = projectedRim(a, radius, f.angle);
+            const x = e.width / 2 + p.x;
+            const y = e.sceneY + p.y;
             ctx.globalAlpha = rim * (.35 + Math.sin(a - t) * .18);
             ctx.drawImage(e.sprite, (i % 6) * 16, 0, 16, 16, x - 2, y - 2, 4, 4);
           }

@@ -6,9 +6,9 @@ export const smooth = (n: number) => { const x = clamp(n); return x * x * (3 - 2
 const TAU = Math.PI * 2;
 
 export const HAND_DIRECTIONS = {
-  orbit: { name: 'Orbital silver', hint: 'Explore the hands. Set possibility in motion.', field: 178, opacity: .71, warmth: .42, grain: .095 },
-  morph: { name: 'Liquid platinum', hint: 'Explore the hands. Shape the possibility.', field: 158, opacity: 0, warmth: .2, grain: .05 },
-  hands: { name: 'Living engraving', hint: 'Explore the hands. Bring value to life.', field: 194, opacity: .43, warmth: .66, grain: .18 },
+  orbit: { name: 'Silver tide', hint: 'A touch. A different perspective.', field: 118, opacity: 0, warmth: .36, grain: .07 },
+  morph: { name: 'Liquid platinum', hint: 'A little intelligence changes everything.', field: 136, opacity: 0, warmth: .25, grain: .045 },
+  hands: { name: 'Human imprint', hint: 'Human insight. Tangible value.', field: 110, opacity: 0, warmth: .62, grain: .11 },
 } as const;
 
 export function materialTone(luminance: number, direction: HandDirection): [number, number, number] {
@@ -67,4 +67,24 @@ export function surfaceWarp(x: number, y: number, radius: number, time: number, 
   const envelope = smooth(1 - Math.hypot(x, y) / Math.max(1, radius));
   const wave = Math.sin(y / 34 - time * 1.85);
   return { x: wave * 17 * envelope * strength, y: Math.sin(x / 51 + time * 1.35) * 8 * envelope * strength };
+}
+
+// Continuous local deformation. The perimeter stays fixed; no detached particles.
+export function touchWarp(direction: HandDirection, x: number, y: number, radius: number, time: number, strength: number, drag: Point = { x: 0, y: 0 }) {
+  const distance = Math.hypot(x, y), envelope = smooth(1 - distance / Math.max(radius, 1));
+  const weight = envelope * envelope * strength;
+  if (!weight) return { x: 0, y: 0 };
+  const nx = x / radius, ny = y / radius;
+  if (direction === 'orbit') {
+    const twist = weight * (.13 + Math.sin(time * 1.2 - distance / 32) * .08);
+    return { x: -y * twist + drag.x * weight * .09, y: x * twist + drag.y * weight * .09 };
+  }
+  if (direction === 'hands') {
+    const pressure = weight * (-.21 + Math.sin(distance / 24 - time * 1.9) * .075);
+    return { x: x * pressure, y: y * pressure + Math.sin(time * 1.4) * weight * ny * 3 };
+  }
+  return {
+    x: (Math.sin(ny * 4.2 - time * 1.6) * ny * 30 + nx * 19 + drag.x * .16) * weight,
+    y: (Math.sin(nx * 4.1 + time * 1.3) * nx * 18 + ny * 12 + drag.y * .14) * weight,
+  };
 }

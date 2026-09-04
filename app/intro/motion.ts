@@ -5,6 +5,18 @@ export const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 export const ease = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * t); };
 export const enter = (n: number) => 1 - Math.pow(1 - clamp(n), 4);
 export const phase = (t: number, start: number, duration: number) => ease((t - start) / duration);
+export const glide = (n: number) => { const t = clamp(n); return t * t * t * (t * (t * 6 - 15) + 10); };
+// The loader's ring and the coin use the same projection. No flat circle jumps
+// into a differently tilted object during the final material handoff.
+export function projectedRim(a: number, radius: number, angle: number, tilt = .17) {
+  const x = Math.cos(a), y = Math.sin(a), z = .115;
+  const rx = x * Math.cos(angle) + z * Math.sin(angle);
+  const rz = -x * Math.sin(angle) + z * Math.cos(angle);
+  const ry = y * Math.cos(tilt) - rz * Math.sin(tilt);
+  const depth = y * Math.sin(tilt) + rz * Math.cos(tilt);
+  const perspective = 5.5 / (5.5 - depth);
+  return { x: rx * radius * perspective, y: ry * radius * perspective };
+}
 export const seeded = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 
 // Integral of a smooth velocity ramp. Never interpolates between angles, so it

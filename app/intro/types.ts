@@ -6,6 +6,8 @@ export type IntroEnvironment = {
   height: number;
   sceneY: number;
   radius: number;
+  introY?: number;
+  introMaxRadius?: number;
   sprite: HTMLCanvasElement;
   handSources: [HandSource[], HandSource[]];
   fingertips: [Point, Point];
