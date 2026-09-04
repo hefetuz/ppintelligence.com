@@ -158,8 +158,11 @@ h1 em { font-weight: 400; color: var(--penny); padding-bottom: 16px; }
   .hero-bottom { grid-template-columns: 1fr; gap: 24px; padding: 24px 0; }.hero-description { font-size: 16px; line-height: 1.65; max-width: 460px; }
   .conversion { text-align: left; }.primary-cta { justify-content: space-between; width: 100%; }.cta-note { text-align: center; }
   .hero-footer { padding: 16px 0; gap: 8px; flex-wrap: wrap; }.founder { font-size: 12px; }.credentials { display: none; }.scene-controls { margin-left: auto; }.linkedin-link { display: none; }.replay-control span { display: none; }.scene-control { padding: 0; }
-  .scene-annotation { font-size: 12px; margin-bottom: 28px; gap: 8px; }.intro-caption { bottom: 88px; }.intro-caption p { font-size: 30px; }
+  .scene-annotation { font-size: 12px; margin-bottom: 28px; gap: 8px; }.intro-caption p { font-size: 30px; }
 }
+/* Keep Skip within the viewport even when the mobile hero is taller than it. */
+.intro-caption { top: min(calc(100% - 190px), calc(100svh - 236px)); bottom: auto; }
+@media (max-width: 880px) { .lab-close { display: inline-flex; font-size: 0; gap: 0; min-width: 24px; justify-content: center; }.lab-replay { padding: 0 6px; min-width: 36px; } }
 @media (prefers-reduced-motion: reduce) {
   .t-stagger-line { transition: none !important; }
   *,*::before,*::after { transition-duration: 0ms !important; }
