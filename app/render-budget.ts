@@ -8,10 +8,14 @@ export function renderBudget(width: number, height: number, deviceRatio: number,
 }
 
 export function handLayout(width: number, stageHeight: number, radius: number) {
-  // Fit anatomy vertically. Only the far forearms extend to the viewport edge.
+  const desktop = width >= 761;
   return {
-    artWidth: Math.min(width < 760 ? width * 1.55 : width * 1.06, Math.max(180, stageHeight - 30) * 2.65),
-    clearance: radius * 1.24,
-    bleed: 72,
+    // Keep the hands visually dominant on wide screens. The artwork is deliberately
+    // larger than the viewport so excess forearm length is cropped by the hero.
+    artWidth: desktop
+      ? Math.min(width * 1.34, Math.max(stageHeight, 260) * 4.15)
+      : width * 1.58,
+    clearance: radius * 1.34,
+    bleed: desktop ? 120 : 72,
   };
 }
