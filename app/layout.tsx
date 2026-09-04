@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Deniz K. Tudor',
-  description: 'Deniz K. Tudor — an exploration of human connection.',
+  title: 'Pretty Penny Intelligence | Strategy, Risk & Growth',
+  description: 'Strategy, risk and technology advisory with Deniz K. Tudor. Helping startups, growing businesses and financial institutions cut costs and move forward.',
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
+    <html lang="en">
       <body>
         {children}
       </body>
