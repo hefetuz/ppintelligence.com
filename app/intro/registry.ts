@@ -1,5 +1,6 @@
 import type { IntroDefinition, IntroId } from './types';
+import { morphIntro } from './morph';
 
-export const DEFAULT_INTRO: IntroId = 'original';
-export const INTRO_DEFINITIONS: IntroDefinition[] = [];
+export const DEFAULT_INTRO: IntroId = 'morph';
+export const INTRO_DEFINITIONS: IntroDefinition[] = [morphIntro];
 export const findIntro = (id: string | null) => INTRO_DEFINITIONS.find(item => item.id === id);
