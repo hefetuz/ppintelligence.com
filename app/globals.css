@@ -2,6 +2,7 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import './site/site.css';
+@import './hero-polish.css';
 @source './page.tsx';
 @source './art-cursor.tsx';
 @source '../components/ui/button.tsx';

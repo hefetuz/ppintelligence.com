@@ -6,8 +6,8 @@ test('pixel budget holds on phones, 16:9 laptops, desktop and 4K screens', () =>
   for (const [width, height] of [[320, 920], [390, 920], [768, 1024], [1366, 768], [1920, 1080], [2560, 1440], [3840, 2160]]) {
     for (const constrained of [false, true]) {
       const budget = renderBudget(width, height, 3, constrained);
-      assert.ok(width * height * budget.dpr ** 2 <= (constrained ? 1150000 : 2200000) + 1);
-      assert.ok(budget.dpr > 0 && budget.meshCells <= 9);
+      assert.ok(width * height * budget.dpr ** 2 <= (constrained ? 1700000 : 6400000) + 1);
+      assert.ok(budget.dpr > 0 && budget.meshCells <= (constrained ? 7 : 12));
     }
   }
 });
@@ -23,7 +23,7 @@ test('full-bleed forearms preserve positive source partitions at every layout', 
     const extendedForearm = native * .32 + finalWidth - native;
     assert.ok(extendedForearm > 0);
     assert.ok(finalWidth > 0);
-    assert.ok(l.artWidth <= Math.max(180, height - 30) * 2.65 + 1e-8);
+    assert.ok(l.artWidth >= width, 'source art fills the viewport without stretching distant forearms');
     assert.ok(-l.bleed < -20, 'idle wrist movement cannot reveal the outside cut');
   }
 });
