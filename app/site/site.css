@@ -13,6 +13,7 @@
 .mobile-menu-trigger { display: none; }
 .mobile-menu { background: var(--ink); padding: 72px 26px 32px; width: min(90vw, 440px) !important; border-color: var(--hairline); }
 .mobile-menu .menu-title { color: var(--paper); font-size: 18px; }
+.mobile-menu > [data-slot="button"] { min-width: 44px; min-height: 44px; }
 .mobile-menu .menu-description { color: var(--silver); font-size: 14px; }
 .mobile-menu nav { margin-top: 30px; }
 .mobile-menu nav a { display: flex; gap: 18px; align-items: baseline; font: 38px/1.4 'Instrument Serif', Georgia, serif; border-top: 1px solid var(--hairline); padding-block: 16px; }

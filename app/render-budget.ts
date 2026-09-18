@@ -14,7 +14,7 @@ export function handLayout(width: number, stageHeight: number, radius: number) {
   return {
     // Oversize the source artwork on desktop so the hands stay dominant and
     // the long forearms are naturally cropped instead of visually stretched.
-    artWidth: desktop ? width * 1.46 : width * 1.58,
+    artWidth: desktop ? width * 1.12 : width * 1.58,
     clearance: radius * (desktop ? 1.16 : 1.3),
     bleed,
   };
