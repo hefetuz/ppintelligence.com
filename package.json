@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
-    "build:preview": "vite build --config vite.presentation.config.ts",
+    "build:preview": "vite build --config vite.presentation.config.ts && node scripts/prerender.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
     "format": "oxfmt"

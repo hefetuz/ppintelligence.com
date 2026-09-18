@@ -1,9 +1,12 @@
 @import 'tailwindcss' source(none);
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import './site/site.css';
 @source './page.tsx';
 @source './art-cursor.tsx';
 @source '../components/ui/button.tsx';
+@source './site/*.tsx';
+@source '../components/ui/sheet.tsx';
 
 @font-face { font-family: 'Instrument Serif'; src: url('/fonts/instrument-serif.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Instrument Serif'; src: url('/fonts/instrument-serif-italic.ttf') format('truetype'); font-style: italic; font-weight: 400; font-display: swap; }

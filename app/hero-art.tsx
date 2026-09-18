@@ -164,7 +164,7 @@ export default function HeroArt({ animate, skipIntro, onIntroComplete, definitio
       canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       for (const layer of [spotlight, handScene]) { layer.width = canvas.width; layer.height = canvas.height; }
-      const hero = canvas.closest('main');
+      const hero = canvas.closest('.hero');
       const titleBottom = hero?.querySelector('.hero-title')?.getBoundingClientRect().bottom;
       const contentTop = hero?.querySelector('.hero-bottom')?.getBoundingClientRect().top;
       const stageTop = titleBottom ? titleBottom - box.top : height * .39;
