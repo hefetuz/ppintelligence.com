@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="A gold Pretty Penny coin at rest">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7ddb0"/><stop offset=".25" stop-color="#be884d"/>
+      <stop offset=".47" stop-color="#edc589"/><stop offset=".72" stop-color="#9a6639"/><stop offset="1" stop-color="#dca66b"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset=".25" stop-color="#fff0cf" stop-opacity="0"/><stop offset=".5" stop-color="#fff0cf" stop-opacity=".42"/><stop offset=".68" stop-color="#fff0cf" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="coin"><circle cx="200" cy="158" r="60"/></clipPath>
+  </defs>
+  <ellipse cx="200" cy="222" rx="72" ry="5" fill="#000" opacity=".22"/>
+  <circle cx="200" cy="158" r="60" fill="url(#metal)"/>
+  <circle cx="200" cy="158" r="59.4" fill="none" stroke="#ffe7bf" stroke-opacity=".9" stroke-width=".7"/>
+  <circle cx="200" cy="158" r="56.8" fill="none" stroke="#ffe7bf" stroke-opacity=".65" stroke-width=".5"/>
+  <circle cx="200" cy="158" r="53.8" fill="none" stroke="#ffe7bf" stroke-opacity=".55" stroke-width=".45"/>
+  <circle cx="200" cy="158" r="47.8" fill="none" stroke="#ffe7bf" stroke-opacity=".35" stroke-width=".3"/>
+  <g transform="translate(177 134) scale(0.06292749658002736 0.06703146374829001)">
+    <path d="M142.821 0H387C508.321 0 592.786 43 592.786 135.143C592.786 153.571 590.482 172 586.643 187.357C672.643 195.036 731 238.036 731 324.036C731 456.107 626.571 568.214 483.75 583.571L414.643 684.929L394.679 580.5L310.214 539.036L406.964 503.714L488.357 394.679L505.25 499.107C585.107 486.821 641.929 416.179 641.929 339.393C641.929 284.107 598.929 264.143 534.429 264.143H350.143L228.821 731H139.75L281.804 184.286H502.179C503.714 175.071 503.714 165.857 503.714 156.643C503.714 101.357 469.929 79.8571 390.071 79.8571H210.393L89.0714 546.714H0L142.821 0Z" fill="#62411e" opacity=".88"/>
+  </g>
+  <g transform="translate(176.7 133.7) scale(0.06292749658002736 0.06703146374829001)">
+    <path d="M142.821 0H387C508.321 0 592.786 43 592.786 135.143C592.786 153.571 590.482 172 586.643 187.357C672.643 195.036 731 238.036 731 324.036C731 456.107 626.571 568.214 483.75 583.571L414.643 684.929L394.679 580.5L310.214 539.036L406.964 503.714L488.357 394.679L505.25 499.107C585.107 486.821 641.929 416.179 641.929 339.393C641.929 284.107 598.929 264.143 534.429 264.143H350.143L228.821 731H139.75L281.804 184.286H502.179C503.714 175.071 503.714 165.857 503.714 156.643C503.714 101.357 469.929 79.8571 390.071 79.8571H210.393L89.0714 546.714H0L142.821 0Z" fill="#fce4ba" opacity=".78"/>
+  </g>
+  <rect x="136" y="94" width="128" height="128" fill="url(#shine)" clip-path="url(#coin)"/>
+</svg>
