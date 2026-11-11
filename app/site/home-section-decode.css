@@ -1,0 +1,50 @@
+/* Only bounded copy/media containers participate; scene and coin clocks stay
+   untouched. Pending incoming content waits until the outgoing glyphs finish. */
+.site-home [data-home-decode='hidden'],
+.site-home [data-home-decode='pending'] {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.site-home [data-home-decode='exiting'],
+.site-home [data-home-decode='entering'] {
+  visibility: visible !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+.site-home [data-home-decode='exiting'] {
+  pointer-events: none !important;
+}
+.site-home [data-home-decode='entering'] {
+  pointer-events: auto !important;
+}
+.site-home
+  .clockwork-story[data-enhanced='true']
+  [data-clockwork-panel][data-home-decode='active'],
+.site-home
+  .clockwork-story[data-enhanced='true']
+  [data-clockwork-panel][data-home-decode='entering'],
+.site-home
+  .clockwork-story[data-enhanced='true']
+  [data-clockwork-panel][data-home-decode='exiting'] {
+  opacity: 1 !important;
+  translate: 0 0 !important;
+}
+.site-home .hero-title[data-home-decode='exiting'],
+.site-home .hero-title[data-home-decode='entering'] {
+  translate: 0 0 !important;
+}
+.site-home .founder-screen:has(.founder-spread[data-home-decode='exiting']) {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-home [data-home-decode] {
+    visibility: visible !important;
+  }
+}
+
+.site-home .founder-art-planes { filter: blur(0); transition: filter 650ms cubic-bezier(.22,1,.36,1); }
+.site-home .founder-spread:is([data-home-decode='hidden'],[data-home-decode='pending'],[data-home-decode='exiting']) .founder-art-planes { filter: blur(8px); }
+@media (prefers-reduced-motion: reduce) { .site-home .founder-art-planes { filter: none !important; transition: none; } }
+
+.site-home .founder-spread[data-in-view='false'] .founder-art-planes { filter:blur(8px); }

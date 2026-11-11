@@ -1,0 +1,334 @@
+/* Reference geometry: Replay's recessed two-column panel and full-bleed floor.
+   The diagram remains semantic HTML; only the decorative surfaces are images. */
+.company-decision-section {
+  --decision-rule: #d4d4d4;
+  position: relative;
+  overflow: hidden;
+  background: #eaebf1;
+  color: #181a1b;
+  background-image: url('/assets/company/replay-reference/grain-light-texture-optimized.svg');
+  background-size: cover;
+  background-blend-mode: multiply;
+}
+.company-decision-spacer {
+  padding-inline: 72px;
+  border-bottom: 1px dashed var(--decision-rule);
+}
+.company-decision-spacer > div {
+  max-width: 1560px;
+  height: 80px;
+  margin-inline: auto;
+  border-inline: 1px dashed var(--decision-rule);
+}
+.company-decision-body {
+  padding-inline: 72px;
+}
+.company-decision-frame {
+  position: relative;
+  max-width: 1560px;
+  margin-inline: auto;
+  padding-top: 80px;
+  border-inline: 1px dashed var(--decision-rule);
+}
+.company-decision-frame::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 0 5.8256% 0;
+  border-inline: 1px dashed var(--decision-rule);
+}
+.company-decision-heading {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  margin-bottom: 64px;
+  padding-inline: 6.6358%;
+}
+.company-story .company-decision-heading h2 {
+  flex: 1;
+  font:400 var(--type-display-small)/1 "Geist Serif",
+    'Times New Roman',
+    serif;
+  letter-spacing: -1.44px;
+  text-wrap: balance;
+}
+.company-decision-copy {
+  flex: 1;
+  width: 100%;
+  max-width: 552px;
+  font:400 var(--type-callout)/1.4 Arial,
+    sans-serif;
+  letter-spacing: -0.48px;
+  color: #727272;
+}
+.company-story .company-decision-copy p + p {
+  margin-top: 16px;
+}
+.decision-room {
+  position: relative;
+}
+.company-story .decision-room__caption {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 5.8256%;
+  height: 2.3148cqw;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  color: #727272;
+  font:400 var(--type-caption-1)/1.2 "Geist Mono",
+    monospace;
+  text-transform: uppercase;
+}
+.decision-room {
+  container-type: inline-size;
+}
+.decision-room__diagram {
+  position: relative;
+  aspect-ratio: 1296 / 674;
+}
+.decision-room__surfaces img {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+}
+.decision-room__wire {
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 39.7639cqw;
+}
+.decision-room__side {
+  top: 2.3148cqw;
+  width: 8.4491%;
+  height: 33.9506cqw;
+}
+.decision-room__side--left {
+  left: 5.8256%;
+  transform: rotate(180deg);
+}
+.decision-room__side--right {
+  left: 85.7253%;
+  transform: scaleY(-1);
+}
+.decision-room__ceiling {
+  top: 2.3148cqw;
+  left: 5.8256%;
+  width: 88.3488%;
+  height: 5.0154cqw;
+  transform: scaleY(-1);
+}
+.decision-room__sill {
+  top: 31.2515cqw;
+  left: 5.8256%;
+  width: 88.3488%;
+  height: 7.3688cqw;
+}
+.decision-room__pattern {
+  top: 2.3148cqw;
+  width: 14.1975%;
+  height: 33.9506cqw;
+}
+.decision-room__pattern--left {
+  left: 0;
+}
+.decision-room__pattern--right {
+  left: 85.8025%;
+  transform: scaleX(-1);
+}
+.decision-room__floor {
+  top: 36.2654cqw;
+  left: 50%;
+  height: 15.8179cqw;
+  width: auto;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.decision-room__inputs {
+  position: absolute;
+  top: 7.3302cqw;
+  left: 14.1975%;
+  width: 71.6049%;
+  height: 23.9198cqw;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff
+    url('/assets/company/replay-reference/02520684f60ceb53-1920.webp')
+    center/cover;
+  border-top: 1px dashed #a8a8a8;
+  border-left: 1px dashed #a8a8a8;
+}
+.decision-room__inputs li {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 1.3889cqw;
+  padding-inline: 1.3889cqw;
+  border-right: 1px dashed #a8a8a8;
+  border-bottom: 1px dashed #a8a8a8;
+  font:
+    400 1.08cqw/1.4 "Geist Mono",
+    monospace;
+  text-transform: uppercase;
+  color: #181a1b;
+}
+.decision-room__inputs svg {
+  width: 1.3889cqw;
+  height: 1.3889cqw;
+  flex-shrink: 0;
+}
+.company-decision-bottom {
+  position: relative;
+  height: 100px;
+}
+.company-decision-bottom img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.decision-room__mobile-cap,
+.decision-room__mobile-side,
+.decision-room__mobile-wire {
+  display: none;
+}
+.company-perspective-art--sectors {
+  padding-block: 24px;
+}
+@media (max-width: 1023px) {
+  .company-decision-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-inline: 12px;
+    margin-bottom: 64px;
+  }
+  .company-decision-heading h2 br {
+    display: none;
+  }
+  .company-decision-copy {
+    flex: auto;
+    max-width: none;
+    width: 100%;
+  }
+  .company-decision-frame::before {
+    display: none;
+  }
+  .company-story .decision-room__caption {
+    position: relative;
+    left: auto;
+    height: 20px;
+    padding-left: 16px;
+    border-block: 1px dashed #a8a8a8;
+    font-size:var(--type-caption-2);
+  }
+  .decision-room__diagram {
+    aspect-ratio: 366 / 416;
+  }
+  .decision-room__wire,
+  .decision-room__side,
+  .decision-room__ceiling,
+  .decision-room__sill,
+  .decision-room__pattern {
+    display: none;
+  }
+  .decision-room__surfaces .decision-room__mobile-wire {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .decision-room__surfaces .decision-room__mobile-cap {
+    display: block;
+    left: 2.7322%;
+    width: 94.5355%;
+    height: 8.7432cqw;
+  }
+  .decision-room__mobile-cap--top {
+    top: 0;
+    transform: scaleY(-1);
+  }
+  .decision-room__mobile-cap--bottom {
+    top: 94.5355cqw;
+  }
+  .decision-room__surfaces .decision-room__mobile-side {
+    display: block;
+    top: 0;
+    width: 10.929%;
+    height: 103.2787cqw;
+  }
+  .decision-room__mobile-side--left {
+    left: 2.7322%;
+    transform: rotate(180deg);
+  }
+  .decision-room__mobile-side--right {
+    left: 86.3388%;
+  }
+  .decision-room__inputs {
+    top: 8.7432cqw;
+    left: 13.6612%;
+    width: 72.6776%;
+    height: 85.7923cqw;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(10, minmax(0, 1fr));
+    z-index: 1;
+  }
+  .decision-room__inputs li {
+    font-size:3.0055cqw;
+    gap: 2.7322cqw;
+    padding-inline: 2.7322cqw;
+  }
+  .decision-room__inputs svg {
+    width: 3.8251cqw;
+    height: 3.8251cqw;
+  }
+  .decision-room__floor {
+    top: 97.5355cqw;
+    height: 16cqw;
+    transform: translateX(-50%) scaleX(0.9);
+  }
+}
+@media (max-width: 639px) {
+  .company-decision-spacer,
+  .company-decision-body {
+    padding-inline: 12px;
+  }
+  .company-decision-spacer > div {
+    height: 64px;
+  }
+  .company-decision-frame {
+    padding-top: 64px;
+  }
+  .company-story .company-decision-heading h2 {
+    font-size:var(--type-large-title);
+    letter-spacing: -1.44px;
+  }
+}
+/* Darker patterned surfaces preserve the existing perspective. */
+.company-story .decision-room__ceiling,
+.company-story .decision-room__sill { filter: brightness(.78) contrast(1.12); }
+@media (max-width:1023px) {
+  .company-story .decision-room__mobile-cap { filter:brightness(.8) contrast(1.1); }
+}
+.decision-room__choices { position:relative; z-index:5; display:flex; justify-content:center; gap:8px; padding:8px; font:var(--type-caption-2) var(--font-mono,monospace); }
+.decision-room__choices button { border:1px solid #84939a; background:#f5f5f3; color:#344d59; padding:7px 13px; cursor:pointer; }
+.decision-room__choices button[aria-pressed='true'] { background:#344d59; color:white; }
+.decision-room__choices button:focus-visible { outline:2px solid #344d59; outline-offset:2px; }
+.decision-room__architecture { position:absolute; z-index:3; top:0; left:0; width:100%; height:36.2654cqw; color:#617986; pointer-events:none; }
+.architecture-pediment,.architecture-pairs,.architecture-frieze { display:none; }
+[data-architecture='2'] :is(.architecture-pediment,.architecture-pairs), [data-architecture='3'] .architecture-frieze { display:inline; }
+[data-architecture='3'] .decision-room__architecture { color:#405d6a; }
+@media(max-width:1023px) { .decision-room__architecture { display:none; } }
+.decision-room__choices { padding-bottom:22px; }
+.decision-room__choices button { min-height:38px; font:var(--type-caption-2) var(--font-mono,monospace); }
+.decision-room__architecture { background:linear-gradient(90deg,#eaebf180 0 5.2%,transparent 5.2% 94.8%,#eaebf180 94.8%); }
+[data-architecture='3'] .decision-room__architecture { filter:drop-shadow(1px 1px 0 #fff8); }
+@media(max-width:1023px) { .decision-room__choices { display:none; } }

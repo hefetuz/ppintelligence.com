@@ -1,0 +1,47 @@
+.work-phases__cta {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:12px 22px;
+  margin-top:24px;
+  background:#263b46;
+  color:#fff;
+  border:1px solid transparent;
+  font-size:var(--type-footnote);
+  line-height:1.4;
+  text-decoration:none;
+  transition:background-color 160ms ease;
+}
+.work-phases__cta:hover {background:#3b505b}
+.work-phases__cta:focus-visible {outline:2px solid #987b50;outline-offset:4px}
+/* A restrained alternative to the original guilloche, opt-in for comparison. */
+html[data-company-texture='fine'] .decision-room__surfaces img:not(.decision-room__wire):not(.decision-room__pattern) {
+  opacity:0;
+}
+html[data-company-texture='fine'] .decision-room__surfaces::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  height:39.736cqw;
+  background:url('/assets/company/previews/penny-engraving.svg') top center / 100% 100% no-repeat;
+  opacity:.72;
+}
+@media(max-width:1023px) {
+  html[data-company-texture='fine'] .decision-room__surfaces::after {height:113.66cqw;background-image:url('/assets/company/previews/penny-engraving-mobile.svg')}
+}
+.company-story .work-phases__drawing {
+  filter:none;
+  --hairline-plate:#eaebf1;
+  --hairline-hi:#344a56;
+  --hairline-edge:#60737e;
+  --hairline-mid:#71818b;
+  --hairline-lo:#9ba6ae;
+}
+.company-story .work-phases__drawing :is(.hairline-stage,.hairline-rest) {
+  transform:none;
+}
+html[data-company-surface='perspective'] .work-phases__drawing {filter:none}
+
+html[data-company-texture='fine'] .decision-room__pattern{opacity:0}

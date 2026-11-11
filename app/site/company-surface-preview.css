@@ -1,0 +1,85 @@
+/* Isolated art direction preview: /about/?surface=perspective#founder */
+html[data-company-surface='perspective'] .company-story .decision-room__floor--engraved{
+ background-image:url('/assets/company/previews/perspective-floor.svg');
+}
+html[data-company-surface='perspective'] .founder-panel{
+ color:#304551;
+ background:#e7ecee;
+ overflow:hidden;
+}
+html[data-company-surface='perspective'] .founder-panel::before{
+ background:repeating-linear-gradient(90deg,transparent 0 calc(8.333333% - 1px),#6e879426 calc(8.333333% - 1px) 8.333333%);
+ opacity:1;filter:none;mix-blend-mode:normal;
+}
+html[data-company-surface='perspective'] .founder-panel__frame{position:relative;background:transparent;z-index:1}
+html[data-company-surface='perspective'] .company-story .work-phases :is(h2,h3){color:#263c49}
+html[data-company-surface='perspective'] .work-phases__heading>p{color:#5d7380;border-color:#6e87944d}
+html[data-company-surface='perspective'] .company-story .work-phases__stage>p{color:#526e7d}
+html[data-company-surface='perspective'] .work-phases__stage{border-color:#6e87942b}
+html[data-company-surface='perspective'] .work-phases__note,
+html[data-company-surface='perspective'] .company-story .work-phases__details p{color:#526773}
+html[data-company-surface='perspective'] .work-phases__details{border-color:#6e879433}
+html[data-company-surface='perspective'] .work-phases__details a{color:#304b5b}
+html[data-company-surface='perspective'] .work-phases__drawing{
+ --hairline-plate:#e7ecee;
+ filter:brightness(.52) saturate(.35);
+}
+html[data-company-surface='perspective'] .founder-panel::before{
+ background-image:linear-gradient(to right,#6e879447 0 1px,transparent 1px);
+ background-size:var(--preview-grid-step, 8.3333%) 100%;
+ background-position:var(--preview-grid-origin, 0px) 0;
+ background-repeat:repeat-x;
+}
+/* Continue only the primary navigation-aligned guides through the section. */
+html[data-company-surface='perspective'] .founder-panel{background:#eaebf1}
+html[data-company-surface='perspective'] .founder-panel::before{
+  left:var(--preview-grid-origin, 0px);
+  right:auto;
+  width:var(--preview-grid-step, 100%);
+  background-image:linear-gradient(to right,#85899140 0 1px,transparent 1px);
+  background-position:0 0;
+  border-right:1px solid #85899140;
+}
+html[data-company-surface='perspective'] .work-phases__stage{border:0}
+html[data-company-surface='perspective'] .work-phases__drawing{--hairline-plate:#eaebf1}
+/* The panel begins where the perspective edges meet. */
+html[data-company-surface='perspective'] .founder-panel{padding:0}
+html[data-company-surface='perspective'] .founder-panel::before{box-sizing:border-box}
+html[data-company-surface='perspective'] .founder-panel__frame{
+  box-sizing:border-box;
+  width:var(--preview-grid-step,100%);
+  max-width:none;
+  margin-left:var(--preview-grid-origin,0px);
+  margin-right:0;
+  padding:clamp(24px,3vw,40px);
+}
+/* Match the decision section's existing grey and paper texture. */
+html[data-company-surface='perspective'] .founder-panel{
+  background:#eaebf1 url('/assets/company/replay-reference/grain-light-texture-optimized.svg') center / cover;
+  background-blend-mode:multiply;
+}
+html[data-company-surface='perspective'] .company-story .decision-room__floor--engraved{
+  background-color:#eaebf1;
+  background-size:100% 100%,cover;
+  background-blend-mode:normal,multiply;
+}
+html[data-company-surface='perspective'] .founder-panel::after{
+  content:'';position:absolute;z-index:0;pointer-events:none;top:0;bottom:0;
+  left:var(--preview-outer-origin,0px);width:var(--preview-outer-width,100%);
+  box-sizing:border-box;border-inline:1px solid #85899140;border-top:1px solid #85899140;
+}
+/* Use the measured navigation edges as the shared page guides. */
+html[data-company-surface='perspective'] .company-centered-hero__frame{border-inline:0}
+html[data-company-surface='perspective'] .company-centered-hero::before{
+  content:'';position:absolute;pointer-events:none;z-index:2;top:0;bottom:0;
+  left:var(--preview-grid-origin,72px);width:var(--preview-grid-step,calc(100% - 144px));
+  box-sizing:border-box;border-inline:1px dashed #a9afb54d;
+}
+html[data-company-surface='perspective'] .company-decision-spacer,
+html[data-company-surface='perspective'] .company-decision-body{padding-inline:0}
+html[data-company-surface='perspective'] .company-decision-spacer>div,
+html[data-company-surface='perspective'] .company-decision-frame{
+  box-sizing:border-box;max-width:none;
+  width:var(--preview-grid-step,calc(100% - 144px));
+  margin-inline:auto;
+}

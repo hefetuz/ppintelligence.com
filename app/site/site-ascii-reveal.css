@@ -1,0 +1,16 @@
+.replay-site,.mobile-navigation,.contact-booking-dialog {
+  --ascii-font:'Geist Mono',monospace;
+  --ascii-accent:#8b7351;
+  --ascii-glyph:#71818b;
+  --ascii-surface:#fcfcfc;
+}
+.replay-site[data-site-ascii='ready'] [data-reveal] {animation:none;transform:none}
+.replay-site[data-site-ascii='ready'][data-entrance='ready'] .site-header,
+.replay-site[data-site-ascii='ready'][data-entrance='ready'] .site-header>* {animation:none}
+/* SSR reserves layout, but loaded content stays hidden until its own reveal.
+   With scripting disabled/unsupported the page remains ordinary readable HTML. */
+@media(scripting:enabled) and (prefers-reduced-motion:no-preference) {
+  .site-page main[data-ascii-boot='pending']>*,
+  .site-home main[data-ascii-boot='pending']>:not(.hero),
+  [data-site-ascii-pending] {visibility:hidden}
+}

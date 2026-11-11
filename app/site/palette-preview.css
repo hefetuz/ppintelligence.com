@@ -1,0 +1,18 @@
+/* Client color comparison only; the full site composition remains intact. */
+.palette-study-note,
+.palette-service-placeholder { display: none; }
+html[data-preview="palette"] .site-home .founder-section,
+html[data-preview="palette"] .site-home .expertise-deliverables,
+html[data-preview="palette"] .site-home .expertise-scope,
+html[data-preview="palette"] .site-home .featured-insights,
+html[data-preview="palette"] .site-home .landing-contact { display: none; }
+html[data-preview="palette"] .site-home .landing-section-heading { margin-block-start: 0; }
+html[data-preview="palette"] .expertise-service-label,
+html[data-preview="palette"] .expertise-service-summary { display: none; }
+html[data-preview="palette"] .palette-service-placeholder { display: inline; }
+html[data-preview="palette"] .site-home .expertise-service h3 {
+  font-size:var(--type-display-size);
+  font-style: italic;
+}
+html[data-preview="palette"] .palette-study-note { display: flex; position: relative; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px var(--gutter); background: var(--muted); color: var(--paper); font-size:var(--type-caption-2); line-height: 1.6; }
+.palette-study-note a { min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; }

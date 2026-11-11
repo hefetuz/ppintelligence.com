@@ -1,0 +1,13 @@
+.replay-site .insight-reading {
+  box-sizing:border-box;max-width:none;margin-inline:var(--replay-frame);padding:clamp(40px,6vw,88px) clamp(24px,6vw,88px);
+  background:#fcfcfc;border-inline:1px dashed var(--rule,#8999a34d);
+}
+.replay-site .insight-reading h1 {max-width:17ch;margin:24px 0;font:400 clamp(38px,5vw,72px)/1.08 'Geist Serif',serif;letter-spacing:-.025em}
+.replay-site .insight-reading .reading-copy {max-width:68ch;margin:40px auto 0;color:#42515a}
+.replay-site .insight-reading .reading-copy p {font:17px/1.85 Geist,Arial,sans-serif;margin:0 0 24px;white-space:normal;overflow:visible}
+.replay-site .insight-reading .detail-lead {max-width:60ch;font:20px/1.6 Geist,Arial,sans-serif;color:#53646e}
+.replay-site .insight-reading .insight-attribution {margin-top:24px;font:12px/1.7 'Geist Mono',monospace;color:#687780}
+@media(max-width:620px) {
+ .replay-site .insight-reading {padding-inline:20px}
+ .replay-site .insight-reading .reading-copy p {font-size:16px;line-height:1.8}
+}

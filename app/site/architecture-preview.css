@@ -1,0 +1,202 @@
+/* Transparent Ionic linework and geometric guide rays share the layout frame. */
+.classical-preview {position:relative;isolation:isolate}
+.classical-preview .company-decision-section {overflow:hidden}
+.classical-preview .company-decision-frame {border:0}
+.classical-preview .company-decision-frame::before {display:block;bottom:15.8cqw;border-inline:1px dashed #8999a338}
+.classical-preview .company-decision-frame::after {content:'';position:absolute;pointer-events:none;inset:0 0 15.8cqw;border-inline:1px dashed #8999a34d}
+.classical-preview .company-decision-heading {margin-bottom:16px}
+.classical-preview .decision-room {margin-top:0}
+.company-story .classical-preview .decision-room__diagram {
+ width:100%;aspect-ratio:1774 / 1350;margin:0;padding:0;container-type:inline-size;background:transparent;
+}
+.classical-preview .decision-room__portico {position:absolute;top:12.965cqw;left:0;display:block;width:100%;height:auto;pointer-events:none}
+.classical-preview .decision-room__construction {position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:#718592;stroke-width:.7;stroke-opacity:.38;pointer-events:none}
+.company-story .classical-preview .decision-room__caption {
+ position:absolute;z-index:2;top:23.4cqw;left:22%;width:56%;height:1.8cqw;margin:0;padding:0;
+ border:0;color:#304a58;font:400 .9cqw/1.2 "Geist Mono",monospace;text-align:center;justify-content:center;
+}
+.classical-preview .decision-room__inputs {
+ top:31cqw;left:21.42%;width:57.16%;height:18.49cqw;
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));
+ margin:0;padding:0;background:transparent;border:0;box-shadow:none;
+}
+.classical-preview .decision-room__inputs li {
+ padding-inline:1.45cqw;gap:1cqw;border:0;border-bottom:1px solid #71859255;color:#263e4a;
+ font:400 .97cqw/1.25 "Geist Mono",monospace;
+}
+.classical-preview .decision-room__inputs li:nth-child(odd) {border-right:1px solid #71859255}
+.classical-preview .decision-room__inputs li:nth-last-child(-n+2) {border-bottom:0}
+.classical-preview .decision-room__inputs svg {width:1.2cqw;height:1.2cqw;flex-shrink:0}
+.classical-preview .founder-panel__frame {border-inline:1px solid #8999a34d;border-bottom:1px solid #8999a34d}
+html[data-company-surface='perspective'] .classical-preview .founder-panel {padding-bottom:clamp(64px,7vw,104px)}
+@media(max-width:767px){
+ html[data-company-surface='perspective'] .classical-preview .company-decision-frame {width:calc(100% - 48px)}
+ .classical-preview .company-decision-heading {padding-inline:0}
+ .classical-preview .company-decision-frame::before {display:none}
+ .classical-preview .company-decision-frame::after {bottom:0}
+ .company-story .classical-preview .decision-room__diagram {aspect-ratio:auto;padding-top:76.1cqw}
+ .classical-preview .decision-room__construction {height:76.1cqw}
+ .classical-preview .decision-room__inputs {
+ position:relative;top:auto;left:auto;width:100%;height:auto;margin:0 0 32px;
+ border:1px solid #9da9af55;grid-template-columns:1fr;grid-template-rows:repeat(10,minmax(44px,auto));
+ }
+ .classical-preview .decision-room__inputs li {min-height:44px;padding:10px 14px;gap:12px;font-size:var(--type-caption-2);border:0!important;border-bottom:1px solid #9da9af55!important}
+ .classical-preview .decision-room__inputs li:last-child {border-bottom:0!important}
+ .classical-preview .decision-room__inputs svg {width:15px;height:15px}
+ .company-story .classical-preview .decision-room__caption {font-size:1.25cqw}
+}
+/* Construction study: contours, datums and registration marks share the page rules. */
+.replay-site {--draft-rule:#8999a34d;--draft-ink:#607581}
+.classical-preview .decision-room__technical {display:block;width:100%;height:auto;overflow:visible;stroke:var(--draft-ink);stroke-linecap:butt;stroke-linejoin:miter}
+.decision-room__technical .portico-outline {stroke-width:1.25}
+.decision-room__technical .portico-detail {stroke-width:.65;stroke-opacity:.7}
+.decision-room__technical .portico-rays {stroke-width:.65;stroke-opacity:.28}
+.decision-room__technical .portico-datums {stroke-width:.75;stroke-opacity:.45;stroke-dasharray:3 4}
+.decision-room__technical .portico-registration {stroke-width:1;stroke-opacity:.85}
+.company-story .classical-preview .decision-room__diagram {aspect-ratio:1920 / 1380}
+.company-story .classical-preview .decision-room__caption {top:23.9cqw;height:1.05cqw;font-size:.72cqw}
+.classical-preview .decision-room__inputs {top:28.90625cqw;left:24.01%;width:51.98%;height:15.52cqw;border:1px solid var(--draft-rule)}
+.classical-preview .decision-room__inputs li {font-size:.88cqw;gap:.85cqw;padding-inline:1.2cqw;border-color:var(--draft-rule)}
+.classical-preview .decision-room__inputs li:nth-child(odd) {border-color:var(--draft-rule)}
+.classical-preview .decision-room__inputs svg {width:1.05cqw;height:1.05cqw}
+@media(max-width:767px){
+ .company-story .classical-preview .decision-room__diagram {aspect-ratio:auto;padding-top:0}
+ .classical-preview .decision-room__inputs {position:relative;top:auto;left:auto;width:100%;height:auto}
+ .classical-preview .decision-room__inputs li {font-size:var(--type-caption-2);gap:12px;padding:10px 14px}
+ .classical-preview .decision-room__inputs svg {width:15px;height:15px}
+ .company-story .classical-preview .decision-room__caption {font-size:1.1cqw}
+}
+/* The building now uses the page frame itself, rather than an inset drawing frame. */
+.replay-site {--draft-rule:#78828b40;--draft-ink:#78828b}
+.classical-preview .company-decision-section {overflow:clip}
+.classical-preview .company-decision-frame::before,
+.classical-preview .company-decision-frame::after {
+ bottom:calc(var(--preview-grid-step,100vw) * .108025);border-color:var(--draft-rule);
+}
+.classical-preview .company-decision-heading {margin-bottom:36px}
+.company-story .classical-preview .decision-room__diagram {aspect-ratio:1296 / 770}
+.classical-preview .decision-room__technical {overflow:visible}
+.classical-preview .decision-room__technical path {vector-effect:non-scaling-stroke;stroke-width:1px}
+.decision-room__technical .portico-outline {stroke:var(--draft-ink);stroke-opacity:.72}
+.decision-room__technical .portico-detail {stroke:var(--draft-ink);stroke-opacity:.4}
+.decision-room__technical .portico-rays {stroke:var(--draft-ink);stroke-opacity:.2}
+.decision-room__technical .portico-datums {stroke:var(--draft-ink);stroke-opacity:.25;stroke-dasharray:3 4}
+.decision-room__technical .portico-registration {stroke:var(--draft-ink);stroke-opacity:.65}
+.company-story .classical-preview .decision-room__caption {
+ top:12.42cqw;height:2.1cqw;left:14.2%;width:71.6%;font-size:.93cqw;
+}
+.classical-preview .decision-room__inputs {
+ top:18.0926cqw;left:14.1875%;width:71.625%;height:24cqw;border:0;
+}
+.classical-preview .decision-room__inputs li {
+ font-size:1.08cqw;padding-inline:1.3889cqw;gap:1.3889cqw;border-bottom:1px dashed var(--draft-rule);
+}
+.classical-preview .decision-room__inputs li:nth-child(odd) {border-right:1px dashed var(--draft-rule)}
+.classical-preview .decision-room__inputs li:nth-last-child(-n+2) {border-bottom:0}
+.classical-preview .decision-room__inputs svg {width:1.3889cqw;height:1.3889cqw}
+.classical-preview .founder-panel__frame {border-color:var(--draft-rule)}
+@media(max-width:767px){
+ .classical-preview .company-decision-frame::after {bottom:0}
+ .company-story .classical-preview .decision-room__diagram {aspect-ratio:auto}
+ .company-story .classical-preview .decision-room__caption {font-size:1.4cqw}
+ .classical-preview .decision-room__inputs {position:relative;top:auto;left:auto;width:100%;height:auto;border:1px dashed var(--draft-rule)}
+ .classical-preview .decision-room__inputs li {font-size:var(--type-caption-2);padding:10px 14px;gap:12px}
+ .classical-preview .decision-room__inputs svg {width:15px;height:15px}
+}
+/* Paper outside, pure white inside the two content panels. */
+.classical-preview .company-decision-section {background-color:#fcfcfc}
+.classical-preview .decision-room__inputs {background:#fff;background-image:none}
+html[data-company-surface='perspective'] .classical-preview .founder-panel {
+ background:#fcfcfc url('/assets/company/replay-reference/grain-light-texture-optimized.svg') center / cover;
+}
+html[data-company-surface='perspective'] .classical-preview .founder-panel__frame {background:#fff;background-image:none}
+html[data-company-surface='perspective'] .classical-preview .founder-panel::before,
+html[data-company-surface='perspective'] .classical-preview .founder-panel::after {display:none}
+.replay-site.site-page:has(.company-story)::before {bottom:auto;height:var(--company-guide-end,100%)}
+html[data-company-surface='perspective'] .classical-preview .work-phases__drawing {--hairline-plate:#fff}
+html[data-company-surface='perspective'] .classical-preview .founder-panel__frame {border-top:1px solid var(--draft-rule)}
+/* Reference guilloche follows the four recessed architectural faces. */
+.portico-textures {stroke:none}
+.portico-texture-cap {opacity:.43}
+.portico-texture-side {opacity:.65}
+/* Process cards share the heading/CTA column's full height. */
+.company-story #how-we-work-heading {font-size:var(--type-display-small);text-wrap:balance}
+.company-story .work-phases__stages {align-self:stretch;align-items:stretch}
+html[data-company-surface='perspective'] .company-story .work-phases__stage {
+ background:#f5f6f7;justify-content:flex-start;align-self:stretch;min-height:0;height:auto;padding:20px 12px 12px;
+}
+html[data-company-surface='perspective'] .classical-preview .work-phases__drawing {--hairline-plate:#f5f6f7}
+html[data-company-surface='perspective'] .company-story .work-phases__stage>p {margin:12px 0 0}
+.company-story .company-centered-hero__content {row-gap:24px}
+.company-story .company-centered-hero__deck {margin:0}
+.company-story .company-centered-hero__button {margin-top:24px}
+/* The approach copy begins directly on the section's upper rule. */
+.classical-preview .company-decision-frame {padding-top:0}
+/* Top labels and enlarged figures deliberately crop at the lower-right card edge. */
+html[data-company-surface='perspective'] .company-story .work-phases__stage {
+ overflow:hidden;padding:16px 0 0 16px;
+}
+html[data-company-surface='perspective'] .company-story .work-phases__stage>p {margin:0 16px 12px 0;position:relative;z-index:2}
+.company-story .work-phases__stage .work-phases__drawing {width:calc(100% + 16px);max-width:none;flex-shrink:0}
+.company-story .work-phases__stage .work-phases__drawing .hairline-artwork {aspect-ratio:1.15;overflow:visible}
+.company-story .work-phases__stage .work-phases__drawing :is(.hairline-stage,.hairline-rest) {transform:translate(10%,12%) scale(1.8);transform-origin:center}
+/* Approach copy shares the inner drafting guides, with no inset from them. */
+.classical-preview .company-decision-heading {padding-inline:5.8256%}
+.company-story .work-phases__drawing svg path {stroke-linecap:butt;stroke-linejoin:miter}
+@media(min-width:768px){
+ .classical-preview .company-decision-spacer>div {height:calc(var(--preview-grid-step, calc(100vw - 144px)) * .058256)}
+}
+@media(max-width:767px){.classical-preview .company-decision-heading {padding-inline:0}}
+
+/* Keep the portico horizontal; mobile inputs form a compact two-column key. */
+@media(max-width:767px) {
+  .classical-preview .decision-room__inputs {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:repeat(5,minmax(52px,auto));
+    margin-bottom:0;
+  }
+  .classical-preview .decision-room__inputs li {
+    min-width:0;min-height:52px;padding:10px 12px;gap:8px;
+    font-size:clamp(9px,1.8vw,11px);line-height:1.4;
+  }
+  .classical-preview .decision-room__inputs li:nth-child(odd) {border-right:1px dashed var(--draft-rule)!important}
+  .classical-preview .decision-room__inputs li:nth-last-child(-n+2) {border-bottom:0!important}
+  .classical-preview .decision-room__inputs svg {width:14px;height:14px}
+}
+
+/* On phones the pediment crowns the readable key, with no empty room between. */
+@media(max-width:767px) {
+  .classical-preview .decision-room__portico-crop {
+    width:100%;height:17.3cqw;overflow:hidden;position:relative;
+  }
+  .classical-preview .decision-room__portico-crop .decision-room__technical {
+    width:100%;height:auto;max-width:none;
+  }
+  .classical-preview .decision-room__inputs {
+    position:relative;z-index:2;margin:0;border-top:0;
+    border-bottom:4px double var(--draft-rule);
+  }
+  .classical-preview .decision-room__inputs li {
+    font-size:11px;min-height:52px;
+  }
+}
+
+.decision-room__mobile-pediment {display:none}
+@media(max-width:767px) {
+  .classical-preview .decision-room__portico-crop {display:none}
+  .classical-preview .decision-room__mobile-pediment {
+    display:block;width:100%;height:auto;stroke:var(--draft-ink);stroke-width:.75;
+  }
+  .classical-preview .decision-room__mobile-pediment path {vector-effect:non-scaling-stroke}
+  .company-story .classical-preview .decision-room__caption {
+    top:13.85cqw;height:2.6cqw;left:0;width:100%;font-size:10px;line-height:1;
+  }
+  .classical-preview .decision-room__inputs {border-bottom:1px dashed var(--draft-rule)}
+  html[data-company-surface='perspective'] .classical-preview .founder-panel {padding-inline:24px;padding-top:0}
+  .classical-preview .founder-panel__frame {width:100%;max-width:none;box-sizing:border-box;margin:0;border-top:0!important}
+}
+@media(max-width:767px) {
+ html[data-company-surface='perspective'] .company-story .classical-preview .founder-panel__frame {
+   width:100%!important;max-width:none!important;margin:0!important;box-sizing:border-box;
+ }
+}

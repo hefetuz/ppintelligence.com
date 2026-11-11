@@ -1,0 +1,348 @@
+/* Reference B: one level camera, three parallel layers, full document surfaces. */
+.company-value-scene.reference-record-scene {
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-align: left;
+  margin-top: 46px;
+}
+.record-scene {
+  position: absolute;
+  width: 1440px;
+  height: 520px;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+.record-scene__layers {
+  position: absolute;
+  inset: 0;
+  mask-image:
+    linear-gradient(transparent 0, #000 9%, #000 90%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+  mask-composite: intersect;
+}
+.record-scene__layer {
+  position: absolute;
+  inset: 0;
+  perspective: 900px;
+  perspective-origin: 50% 445px;
+}
+.record-scene__plane {
+  position: absolute;
+  left: 50%;
+  top: 445px;
+  width: 0;
+  height: 0;
+  transform: rotateX(58deg);
+  transform-origin: 0 0;
+}
+.record-scene__card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transform-origin: 50% 50%;
+  animation: record-surface-flow 28s linear infinite;
+  animation-delay: var(--phase);
+  backface-visibility: hidden;
+}
+.record-scene__raw .record-scene__card {
+  animation-name: record-raw-flow;
+  left: 574px;
+  top: 2200px;
+}
+.record-scene__raw-clip {
+  position:absolute;
+  left:-574px;
+  top:-2200px;
+  width:1148px;
+  height:1823.5px;
+  overflow:hidden;
+}
+.record-scene__sheet {
+  position: absolute;
+  top: -900px;
+  left: -610px;
+  width: 1220px;
+  height: 900px;
+}
+.record-scene__glass {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(#ffffff6b, #ffffff38 62%, #ffffff0f),
+    linear-gradient(#00000013, #00000009 58%, transparent);
+}
+.record-scene__feed {
+  position: absolute;
+  inset: 10px 0 0;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent 0, #000 90px);
+  clip-path: inset(0 0 366.5px);
+}
+.record-scene__output {
+  position: absolute;
+  inset: 523.5px 0 0;
+  overflow: hidden;
+}
+.record-scene__card--value {
+  left: 610px;
+  top: 376.5px;
+}
+.record-scene__card--clean {
+  left: 610px;
+  top: 890px;
+  opacity: 0.78;
+}
+.record-scene__wash {
+  position: absolute;
+  top: 528px;
+  left: -90px;
+  right: -90px;
+  height: 320px;
+  opacity: 0.46;
+  background: linear-gradient(#397a9e80, #477f9c28 45%, transparent 90%);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.record-scene__wash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/assets/company/records/weave.webp') center/512px;
+  mix-blend-mode: soft-light;
+}
+.record-scene__scan {
+  position: absolute;
+  top: 523.5px;
+  height: 4.5px;
+  left: -90px;
+  right: -90px;
+  background: linear-gradient(90deg, #436e86, #3b7a9d 45%, #284b65);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.record-scene__veil {
+  position: absolute;
+  inset: 684px 0 0;
+  background: linear-gradient(#fcfcfc00, #fcfcfc9e 55%, #fcfcfcf2);
+}
+.record-scene__stroke {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 3px #f1f1f1,
+    inset 0 0 0 4px #ffffffcc;
+  mask-image: linear-gradient(#000 0, #000 66%, transparent 96%);
+}
+.record-scene__motes > i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 12px;
+  opacity: 0.7;
+  animation: record-mote-flow 28s linear infinite;
+  animation-delay: var(--phase);
+}
+.record-scene__callouts {
+  position: absolute;
+  inset: 0;
+  width: 1440px;
+  height: 520px;
+  pointer-events: none;
+}
+.record-scene__callout {
+  opacity: 0.8;
+}
+.record-scene__callout text {
+  fill: #454d53;
+  font:var(--type-caption-1) Arial,
+    sans-serif;
+}
+.record-scene__callout .record-scene__detail {
+  fill: #838b90;
+  font:var(--type-caption-2) "Geist Mono",
+    monospace;
+  letter-spacing: 0.9px;
+}
+@keyframes record-surface-flow {
+  0% {
+    transform: translate3d(var(--record-x), -1900px, 0)
+      rotate(var(--record-turn)) translate(-50%, -50%);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.82;
+  }
+  82% {
+    opacity: 0.82;
+  }
+  100% {
+    transform: translate3d(var(--record-x), 220px, 0) rotate(var(--record-turn))
+      translate(-50%, -50%);
+    opacity: 0;
+  }
+}
+@keyframes record-raw-flow {
+  0% {
+    transform: translate3d(var(--record-x), -1900px, 0)
+      rotate(var(--record-turn)) translate(-50%, -50%);
+    opacity: 0;
+  }
+  12%,
+  60% {
+    opacity: 0.86;
+  }
+  74%,
+  100% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(var(--record-x), 220px, 0) rotate(var(--record-turn))
+      translate(-50%, -50%);
+  }
+}
+@keyframes record-mote-flow {
+  0% {
+    transform: translate3d(var(--record-x), -2100px, 0);
+    opacity: 0;
+  }
+  20%,
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(var(--record-x), 180px, 0);
+    opacity: 0;
+  }
+}
+.reference-record-scene[data-playing='false']
+  :is(.record-scene__card, .record-scene__motes > i) {
+  animation-play-state: paused;
+}
+.company-centered-hero:has(.reference-record-scene) {
+  height: auto;
+  min-height: 100svh;
+}
+.company-centered-hero:has(.reference-record-scene)
+  .company-centered-hero__frame {
+  flex-direction: column;
+}
+.company-centered-hero:has(.reference-record-scene)
+  .company-centered-hero__content {
+  flex: 0;
+  padding: 150px 24px 0;
+  gap: 24px;
+}
+@media (max-width: 700px) {
+  .company-value-scene.reference-record-scene {
+    margin-top: 40px;
+  }
+  .company-centered-hero:has(.reference-record-scene)
+    .company-centered-hero__content {
+    padding-top: 130px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reference-record-scene :is(.record-scene__card, .record-scene__motes > i) {
+    animation-play-state: paused;
+  }
+}
+/* Callouts follow the same 28-second transport clock as their source sheets. */
+.record-scene__callout--tracked {
+  opacity: 0;
+  animation: record-callout-track 28s linear infinite;
+  animation-delay: var(--phase);
+}
+.record-scene__leader {
+  stroke-dasharray: 1;
+  animation: record-callout-leader 28s linear infinite;
+  animation-delay: var(--phase);
+}
+.record-scene__callout--tracked text {
+  animation: record-callout-type 28s linear infinite;
+  animation-delay: var(--phase);
+}
+@keyframes record-callout-track {
+  0%,
+  34% {
+    opacity: 0;
+    transform: translate(0, -16px);
+  }
+  37% {
+    opacity: 0.85;
+  }
+  47% {
+    opacity: 0.85;
+  }
+  51% {
+    opacity: 0;
+    transform: translate(0, 46px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 46px);
+  }
+}
+@keyframes record-callout-leader {
+  0%,
+  34% {
+    stroke-dashoffset: 1;
+  }
+  37%,
+  48% {
+    stroke-dashoffset: 0;
+  }
+  51%,
+  100% {
+    stroke-dashoffset: -1;
+  }
+}
+@keyframes record-callout-type {
+  0%,
+  35% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  38%,
+  47% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50%,
+  100% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+.reference-record-scene[data-playing='false']
+  :is(.record-scene__callout--tracked, .record-scene__callout--tracked *) {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .record-scene__callout--tracked,
+  .record-scene__callout--tracked * {
+    animation: none;
+  }
+  .record-scene__callout--tracked:nth-child(-n + 2) {
+    opacity: 0.8;
+  }
+}
+/* Let the faded illustration meet the next section without an empty tail. */
+.company-centered-hero:has(.reference-record-scene){min-height:0}
+.company-centered-hero:has(.reference-record-scene) .company-centered-hero__frame{flex:0 0 auto}
+.record-scene__callout .record-scene__source{font-weight:600;letter-spacing:.035em}
+.record-scene__leader{stroke:#83939b;stroke-width:.9}
+/* The records share the page's paper instead of sitting on a white plinth. */
+.company-centered-hero:has(.reference-record-scene) {background-color:#eaebf1}
+.company-value-scene.reference-record-scene {mix-blend-mode:multiply}
+.record-scene__glass {
+  background:linear-gradient(#6b7f8b0b, #6b7f8b05 60%, transparent);
+}
+.record-scene__veil {background:none}
+.record-scene__output {
+  mask-image:linear-gradient(#000 0%,#000 48%,transparent 97%);
+}
+.record-scene__stroke {box-shadow:none}
+.record-scene__callout .record-scene__detail {letter-spacing:.12em}

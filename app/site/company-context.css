@@ -1,0 +1,267 @@
+.company-orbit {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+  color: #344c42;
+}
+
+.company-orbit__legend {
+  margin: 0 0 6px;
+  text-align: center;
+  font-family: var(--font-mono, "Geist Mono", monospace);
+  font-size:var(--type-caption-2);
+  font-weight: 400;
+  letter-spacing: 0.045em;
+  line-height: 1.5;
+}
+
+.company-orbit__diagram {
+  position: relative;
+  height: 290px;
+}
+.company-orbit__guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.company-orbit__cloth {
+  position: absolute;
+  top: 81px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 142px;
+  height: 142px;
+  border: 1px solid #22495f;
+  background-color: #315b73;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 2px,
+      rgb(154 174 177 / 42%) 2px 2.5px,
+      transparent 2.5px 5px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 2px,
+      rgb(11 43 62 / 55%) 2px 3px,
+      transparent 3px 5px
+    );
+  box-shadow:
+    4px 5px 0 #193e55,
+    7px 9px 0 rgb(41 65 61 / 5%);
+  transform: translateX(-50%) rotate(-12deg) skew(-3deg);
+}
+
+.company-orbit__cloth-seam {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgb(190 202 197 / 52%);
+  outline: 1px solid rgb(9 40 58 / 25%);
+  outline-offset: 2px;
+}
+
+.company-orbit__cloth img {
+  display: block;
+  width: 46px;
+  height: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.94;
+  transform: skew(3deg) rotate(12deg);
+}
+
+.company-orbit__sectors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.company-orbit__card {
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  min-height: 48px;
+  width: 139px;
+  padding: 10px 13px;
+  border: 1px solid #c9cbbb;
+  background: #f8f4ea;
+  box-shadow: 0 3px 0 #e4e2d5;
+  font-family: var(--font-mono, "Geist Mono", monospace);
+  font-size:var(--type-caption-2);
+  line-height: 1.4;
+}
+.company-orbit__card svg {
+  flex: 0 0 auto;
+  color: #627c6b;
+}
+.company-orbit__card--fintech {
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.company-orbit__card--banking {
+  top: 154px;
+  left: 0;
+}
+.company-orbit__card--technology {
+  top: 154px;
+  right: 0;
+}
+
+.company-orbit__stages {
+  padding-top: 14px;
+  border-top: 1px solid #d4d6c8;
+  text-align: center;
+  font-family: var(--font-mono, "Geist Mono", monospace);
+  font-size:var(--type-caption-2);
+  line-height: 1.7;
+}
+.company-orbit__stages p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0 0 6px;
+  color: #798471;
+  font-size:var(--type-caption-2);
+}
+.company-orbit__stages ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.company-orbit__stages li + li::before {
+  content: '·';
+  margin-inline: 9px;
+  color: #939e89;
+}
+
+@media (max-width: 480px) {
+  .company-orbit__diagram {
+    height: 280px;
+  }
+  .company-orbit__cloth {
+    top: 74px;
+    width: 128px;
+    height: 128px;
+  }
+  .company-orbit__card {
+    width: 119px;
+    min-height: 43px;
+    gap: 7px;
+    padding: 9px 10px;
+    font-size:var(--type-caption-2);
+  }
+  .company-orbit__card--banking,
+  .company-orbit__card--technology {
+    top: 216px;
+  }
+  .company-orbit__card--banking {
+    left: 4%;
+  }
+  .company-orbit__card--technology {
+    right: 4%;
+  }
+  .company-orbit__stages li + li::before {
+    margin-inline: 6px;
+  }
+}
+.company-orbit__diagram {
+  height: 350px;
+  background-image:
+    linear-gradient(#344c4208 1px, transparent 1px),
+    linear-gradient(90deg, #344c4208 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+.company-orbit__legend {
+  margin-bottom: 14px !important;
+  text-align: start;
+  font:var(--type-caption-2)/1.6 "Geist Mono",
+    monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #68746b;
+}
+.company-orbit__cloth {
+  top: 122px;
+  width: 142px;
+  height: 142px;
+  transform: translateX(-50%);
+  box-shadow: 3px 4px 0 #193e55;
+}
+.company-orbit__cloth img {
+  transform: none;
+}
+.company-orbit__card {
+  width: 110px;
+  min-height: 100px;
+  align-items: start;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 18px;
+  padding: 13px;
+  border: 1px dashed #6f80756e;
+  box-shadow: none;
+  font:var(--type-title-3)/1.15 "Geist Serif", serif;
+}
+.company-orbit__card--fintech {
+  top: 4px;
+}
+.company-orbit__card--banking,
+.company-orbit__card--technology {
+  top: 174px;
+}
+.company-orbit__guide {
+  opacity: 0.5;
+}
+.company-orbit__stages {
+  text-align: start;
+  font-family: Geist, sans-serif;
+  font-size:var(--type-caption-2);
+}
+.company-orbit__stages p,
+.company-orbit__stages ul {
+  justify-content: start;
+}
+@media (max-width: 760px) {
+  .company-orbit {
+    max-width: 460px;
+  }
+}
+@media (max-width: 480px) {
+  .company-orbit__diagram {
+    height: 310px;
+  }
+  .company-orbit__cloth {
+    top: 107px;
+    width: 112px;
+    height: 112px;
+  }
+  .company-orbit__card {
+    width: 95px;
+    min-height: 83px;
+    padding: 10px;
+    font-size:var(--type-body-size);
+    gap: 14px;
+  }
+  .company-orbit__card--banking {
+    top: 218px;
+    left: 0;
+  }
+  .company-orbit__card--technology {
+    top: 218px;
+    right: 0;
+  }
+  .company-orbit__guide {
+    top: 35px;
+    height: 250px;
+  }
+}

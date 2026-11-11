@@ -1,0 +1,642 @@
+/* Warm opening only. The story owns when this surface gives way to clockwork. */
+.silver-landing
+  .site-home:has(.clockwork-story[data-hero-surface='warm'])
+  > .site-header {
+  background: #f8fafb;
+  color: #243a43;
+}
+.silver-landing
+  .site-home:has(.clockwork-story[data-hero-surface='warm'])
+  > .site-header
+  :is(.desktop-nav a, .mobile-menu-trigger, .hero-motion-control, .wordmark) {
+  color: #243a43;
+}
+.silver-landing
+  .site-home:has(.clockwork-story[data-hero-surface='warm'])
+  > .site-header
+  .wordmark
+  > span {
+  color: #687373;
+}
+.silver-landing
+  .site-home:has(.clockwork-story[data-hero-surface='warm'])
+  > .site-header
+  .header-contact {
+  background: #243a43;
+  color: #fff;
+  border-color: #243a43;
+}
+.silver-landing
+  .site-home:has(.clockwork-story[data-hero-surface='warm'])
+  > .site-header
+  .pp-mark-solid {
+  opacity: 1;
+  fill: #243a43;
+  filter: brightness(0);
+}
+.silver-landing
+  .site-home:has(.clockwork-story[data-hero-surface='warm'])
+  > .site-header
+  .pp-mark-outline {
+  opacity: 0;
+}
+.silver-landing .replay-site.site-home .hero[data-reference-hero] {
+  --hero-scene-bg: #f8fafb;
+  background: #f8fafb;
+  color: #243a43;
+  min-height: 100svh;
+  padding: 80px 0 18px;
+  overflow: hidden;
+  opacity: var(--warm-hero-opacity, 1);
+}
+.silver-landing .replay-site.site-home .hero[data-reference-hero] .artwork {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  opacity: 1;
+  mask-image: none;
+  overflow: visible;
+}
+.hero[data-reference-hero] .artwork::before,
+.hero[data-reference-hero] .artwork::after {
+  display: none;
+}
+.hero[data-reference-hero] .reference-composition {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+  overflow: visible;
+}
+.hero[data-reference-hero] .reference-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero[data-reference-hero] .reference-atmosphere[data-initial='pending'] img,
+.hero[data-reference-hero] .reference-composition[data-ready='false'] img {
+  visibility: hidden;
+}
+.hero[data-reference-hero][data-ascii-entrance='running']
+  :is(.reference-hand-motion, .reference-cloud img, .reference-sky) {
+  animation-play-state: paused;
+}
+.hero[data-reference-hero] .reference-depth-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+.hero[data-reference-hero][data-depth='ready'] .reference-sky {
+  scale: calc(1 + var(--warm-camera-travel, 0) * 0.025);
+}
+.hero[data-reference-hero]:not([data-depth='ready']) .artwork {
+  scale: calc(1 + var(--warm-camera-travel, 0) * 0.12);
+  transform-origin: 50% 50%;
+}
+.hero[data-reference-hero]:not([data-depth='ready']) .reference-atmosphere {
+  scale: calc(1 + var(--warm-camera-travel, 0) * 0.04);
+}
+.hero[data-reference-hero] .reference-atmosphere .reference-sky {
+  mask-image: radial-gradient(
+    ellipse 68% 54% at 50% 50%,
+    #000 12%,
+    #000000d1 36%,
+    #00000059 64%,
+    transparent 94%
+  );
+}
+.hero[data-reference-hero] .reference-sky {
+  position: absolute;
+  inset: -3%;
+  z-index: 0;
+  animation: reference-sky 48s ease-in-out -9s infinite;
+}
+.hero[data-reference-hero] .reference-sky img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero[data-reference-hero] .reference-scene {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 112%;
+  aspect-ratio: 1308/485;
+  transform: translate(-50%, -50%);
+  isolation: isolate;
+}
+.hero[data-reference-hero] .reference-scene img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  pointer-events: none;
+}
+/* One shared orbit plane stays above the opening sky and follows the same
+   camera into the technical scene. Never crossfade a second hero grid. */
+.clockwork-story[data-hero-style='warm'] .silver-geometry-blueprint {
+  z-index: 4;
+}
+.clockwork-story[data-hero-style='warm'][data-hero-surface='warm']
+  .silver-geometry-blueprint {
+  z-index: 1;
+}
+/* Resting pose and breathing movement use separate transforms. Scaling around
+   the wrists keeps the fingertips comfortably clear of the full coin face. */
+.hero[data-reference-hero] .reference-hand-pose {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.hero[data-reference-hero] .reference-hand-left {
+  clip-path: inset(0 50% 0 0);
+  transform-origin: 0 48%;
+  transform: translateX(-3%) scale(0.95);
+}
+.hero[data-reference-hero] .reference-hand-right {
+  clip-path: inset(0 0 0 50%);
+  transform-origin: 100% 50%;
+  transform: translateX(3%) scale(0.95);
+}
+.hero[data-reference-hero] .reference-hand-left img {
+  transform-origin: 0 48%;
+  animation: reference-left 9s ease-in-out -3s infinite alternate;
+}
+.hero[data-reference-hero] .reference-hand-right img {
+  transform-origin: 100% 50%;
+  animation: reference-right 11s ease-in-out -7s infinite alternate;
+}
+.hero[data-reference-hero] .reference-coin {
+  position: absolute;
+  z-index: 4;
+  width: 9.5%;
+  max-width: 150px;
+  aspect-ratio: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(14deg);
+}
+.hero[data-reference-hero] .reference-coin canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 450ms ease-out;
+}
+.hero[data-reference-hero]
+  .reference-composition[data-ready='true']
+  .reference-coin
+  canvas {
+  opacity: 1;
+}
+.hero[data-reference-hero] .reference-cloud {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.35;
+  aspect-ratio: 1942 / 809;
+  height: auto;
+}
+.hero[data-reference-hero] .reference-cloud img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  mask-image:
+    linear-gradient(to right, transparent, #000 3%, #000 97%, transparent),
+    linear-gradient(to bottom, transparent, #000 3%, #000 97%, transparent);
+  mask-composite: intersect;
+}
+.hero[data-reference-hero] .reference-cloud-far {
+  width: 48%;
+  left: 28%;
+  top: 8%;
+  z-index: 0;
+}
+.hero[data-reference-hero] .reference-cloud-far img {
+  animation: reference-cloud-far 48s ease-in-out -7s infinite;
+}
+.hero[data-reference-hero] .reference-cloud-near-left {
+  width: 62%;
+  left: -24%;
+  top: 32%;
+  z-index: 2;
+  opacity: 0.65;
+}
+.hero[data-reference-hero] .reference-cloud-near-left img {
+  filter: blur(3.5px);
+  animation: reference-cloud-left 32s ease-in-out -4s infinite;
+}
+.hero[data-reference-hero] .reference-cloud-near-right {
+  width: 58%;
+  right: -30%;
+  top: 30%;
+  z-index: 2;
+  opacity: 0.5;
+}
+.hero[data-reference-hero] .reference-cloud-near-right img {
+  filter: blur(3.5px);
+  animation: reference-cloud-right 40s ease-in-out -9s infinite;
+}
+.hero[data-reference-hero]
+  :is(.reference-composition, .reference-atmosphere)[data-playing='false']
+  :is(.reference-sky, .reference-hand-motion, .reference-cloud img) {
+  animation-play-state: paused;
+}
+.silver-landing .replay-site.site-home .hero[data-reference-hero] .hero-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  max-width: none;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  color: #243a43;
+  opacity: var(--warm-copy-opacity, 1);
+  scale: calc(1 + var(--warm-camera-travel, 0) * 0.012);
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}
+.silver-landing
+  .replay-site.site-home
+  .hero[data-reference-hero]
+  .hero-title
+  h1 {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(50% + clamp(80px, 12svh, 140px));
+  margin: 0;
+  padding-inline: 24px;
+  font-size:var(--type-display-size);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.silver-landing .hero[data-reference-hero] .hero-title h1 em {
+  color: #8c7045;
+}
+.silver-landing .hero[data-reference-hero] #hero-heading :is(span, em) {
+  display: block;
+  white-space: nowrap;
+}
+.silver-landing .hero[data-reference-hero] .hero-title > .eyebrow {
+  color: #6d7776;
+  margin-bottom: 14px;
+}
+.silver-landing .hero[data-reference-hero] .hero-booking::before {
+  display: none;
+}
+.silver-landing
+  .replay-site.site-home
+  .hero[data-reference-hero]
+  .hero-booking {
+  position: absolute;
+  top: calc(50% + clamp(80px, 12svh, 140px));
+  left: 50%;
+  translate: -50% 0;
+  width: min(620px, calc(100% - 40px));
+  margin: 0;
+  pointer-events: auto;
+  gap: 0;
+}
+.silver-landing
+  .replay-site.site-home
+  .hero[data-reference-hero]
+  .hero-booking-prompt {
+  color: #687373;
+}
+.silver-landing
+  .replay-site.site-home
+  .hero[data-reference-hero]
+  .hero-booking-actions {
+  margin-top: 0;
+}
+.silver-landing
+  .replay-site.site-home
+  .hero[data-reference-hero]
+  .hero-booking-link {
+  background: #243a43;
+  color: #fff;
+  border: 0;
+  padding: 14px 26px;
+}
+.silver-landing
+  .hero[data-reference-hero]
+  :is(.hero-booking-detail, .hero-explore-link, .hero-scene-controls) {
+  color: #687373;
+}
+.silver-landing .hero[data-reference-hero] > .brand-marquee {
+  display: none;
+}
+.silver-landing
+  .replay-site.site-home
+  .hero[data-reference-hero]
+  > .hero-scroll-link {
+  color: #687373;
+  opacity: var(--warm-copy-opacity, 1) !important;
+  position: absolute;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+.hero[data-reference-hero] > .hero-scroll-link svg {
+  flex: none;
+}
+
+.clockwork-story[data-hero-style='warm'][data-intro='running']
+  .silver-geometry-blueprint {
+  visibility: visible;
+}
+.clockwork-story[data-hero-style='warm']
+  :is([data-blueprint-line], [data-blueprint-ray]) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.clockwork-story[data-hero-style='warm'][data-intro='running']
+  :is([data-blueprint-line], [data-blueprint-ray]) {
+  animation: warm-grid-trace 1800ms cubic-bezier(0.22, 0.61, 0.36, 1) 550ms both;
+}
+.clockwork-story[data-hero-style='warm'][data-intro='running']
+  [data-blueprint-line='1'] {
+  animation-delay: 750ms;
+}
+.clockwork-story[data-hero-style='warm'][data-intro='running']
+  [data-blueprint-line='2'] {
+  animation-delay: 950ms;
+}
+@keyframes warm-grid-trace {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes reference-left {
+  from {
+    transform: translate(-0.55%, 0.45%) rotate(-0.6deg);
+  }
+  to {
+    transform: translate(0.65%, -0.45%) rotate(0.65deg);
+  }
+}
+@keyframes reference-right {
+  from {
+    transform: translate(0.6%, -0.45%) rotate(0.55deg);
+  }
+  to {
+    transform: translate(-0.65%, 0.5%) rotate(-0.6deg);
+  }
+}
+@keyframes reference-sky {
+  0%,
+  100% {
+    transform: translate3d(-0.4%, 0, 0) scale(1.025);
+  }
+  50% {
+    transform: translate3d(0.4%, -0.3%, 0) scale(1.025);
+  }
+}
+/* Closed paths: every plane returns to the identical transform at100%.
+   Different periods/phases establish depth without a reset or image swap. */
+@keyframes reference-cloud-far {
+  0%,
+  100% {
+    transform: translate3d(-14px, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, -6px, 0);
+  }
+  50% {
+    transform: translate3d(14px, 0, 0);
+  }
+  75% {
+    transform: translate3d(0, 6px, 0);
+  }
+}
+@keyframes reference-cloud-left {
+  0%,
+  100% {
+    transform: translate3d(-38px, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, -14px, 0);
+  }
+  50% {
+    transform: translate3d(38px, 0, 0);
+  }
+  75% {
+    transform: translate3d(0, 14px, 0);
+  }
+}
+@keyframes reference-cloud-right {
+  0%,
+  100% {
+    transform: translate3d(32px, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, 12px, 0);
+  }
+  50% {
+    transform: translate3d(-32px, 0, 0);
+  }
+  75% {
+    transform: translate3d(0, -12px, 0);
+  }
+}
+@media (max-width: 650px) {
+  .hero[data-reference-hero] .reference-atmosphere .reference-sky {
+    mask-image: radial-gradient(
+      ellipse 80% 43% at 50% 50%,
+      #000 15%,
+      #000000c0 36%,
+      #00000040 64%,
+      transparent 95%
+    );
+  }
+  .hero[data-reference-hero] .reference-cloud-far {
+    width: 150%;
+    left: -25%;
+    top: 10%;
+  }
+  .hero[data-reference-hero] .reference-cloud-near-left {
+    width: 140%;
+    left: -95%;
+    top: 30%;
+  }
+  .hero[data-reference-hero] .reference-cloud-near-right {
+    width: 140%;
+    right: -95%;
+    top: 34%;
+  }
+  .silver-landing .replay-site.site-home .hero[data-reference-hero] {
+    padding-top: 80px;
+  }
+  .silver-landing .replay-site.site-home .hero[data-reference-hero] .artwork {
+    height: 100%;
+  }
+  .hero[data-reference-hero] .reference-scene {
+    width: 170vw;
+  }
+  .silver-landing
+    .replay-site.site-home
+    .hero[data-reference-hero]
+    .hero-title {
+    padding: 0;
+  }
+  .silver-landing
+    .replay-site.site-home
+    .hero[data-reference-hero]
+    .hero-title
+    h1 {
+    font-size:var(--type-display-size);
+    line-height: 1.06;
+  }
+  .silver-landing
+    .replay-site.site-home
+    .hero[data-reference-hero]
+    .hero-booking-actions {
+    margin-top: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .clockwork-story[data-hero-style='warm']
+    :is([data-blueprint-line], [data-blueprint-ray]) {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+  .warm-unified-canvas {
+    display: block !important;
+  }
+  .hero[data-reference-hero]
+    :is(.reference-sky, .reference-hand-motion, .reference-cloud img) {
+    animation: none;
+  }
+  .hero[data-reference-hero] .reference-coin canvas {
+    transition: none;
+  }
+}
+.hero[data-reference-hero][data-drawing] .reference-sky,
+.hero[data-reference-hero][data-drawing] .reference-cloud { display:none; }
+.hero[data-reference-hero][data-drawing] .reference-scene { width:158%; aspect-ratio:2172/724; }
+/* Hands and coin share the same scene coordinates: never clamp one alone. */
+.hero[data-reference-hero][data-drawing] .reference-coin { width:4.5%; max-width:none; }
+.silver-landing .replay-site.site-home .hero[data-reference-hero] { --hero-scene-bg:#fff; background:#fff; }
+.hero[data-reference-hero][data-drawing] .reference-cloud-far { display:block; opacity:.65; }
+.hero[data-reference-hero][data-drawing] .reference-cloud-far { inset:0; width:100%; height:100%; transform:none; }
+.hero[data-reference-hero][data-drawing] .reference-cloud-far img { width:100%; height:100%; object-fit:cover; }
+.hero[data-reference-hero][data-drawing] .reference-hand-left,
+.hero[data-reference-hero][data-drawing] .reference-hand-right { transform:none; }
+.clockwork-story[data-hero-style='warm']:not([data-grid-ready='true']) .silver-geometry-blueprint {
+  visibility:hidden!important;
+}
+.clockwork-story[data-hero-style='warm'][data-grid-ready='true'] :is([data-blueprint-line], [data-blueprint-ray]) {
+  stroke-dasharray:1!important;
+  animation: warm-grid-trace 1800ms cubic-bezier(.23,1,.32,1) both!important;
+}
+.clockwork-story[data-hero-style='warm'][data-grid-ready='true'] [data-blueprint-line='1'] { animation-delay:120ms!important; }
+.clockwork-story[data-hero-style='warm'][data-grid-ready='true'] [data-blueprint-line='2'] { animation-delay:240ms!important; }
+@media(prefers-reduced-motion:reduce) {
+  .clockwork-story[data-hero-style='warm'][data-grid-ready='true'] :is([data-blueprint-line], [data-blueprint-ray]) { animation:none!important;stroke-dashoffset:0!important; }
+}
+.silver-landing .hero[data-reference-hero] .hero-title {
+  translate:0 calc(var(--warm-copy-exit,0) * -24px);
+  filter:blur(calc(var(--warm-copy-exit,0) * 8px));
+}
+/* The shared ASCII controller owns title and CTA as one entrance. */
+.hero[data-reference-hero].scene-ready #hero-heading :is(span,em) {animation:none}
+.hero[data-reference-hero] > .hero-scroll-link {
+  display:inline-flex;flex-direction:row;align-items:center;gap:12px;
+  padding:10px 14px;min-height:44px;border:1px solid #60758140;
+  font:400 10px/1.2 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase;
+}
+.hero[data-reference-hero] > .hero-scroll-link svg {width:20px;height:20px}
+@media(hover:hover){.hero[data-reference-hero] > .hero-scroll-link:hover {background:#6075810a;border-color:#60758180}}
+
+/* Contour sketches share the radial grid's empty outer field. Static masks only. */
+.hero[data-reference-hero][data-drawing='engraving'] .reference-scene {
+  mask-image:none;
+}
+.hero[data-reference-hero][data-drawing='engraving'] .reference-hand-motion {opacity:1}
+.hero[data-reference-hero][data-drawing='engraving'] .reference-cloud-far {
+  opacity:.3;mask-image:radial-gradient(ellipse 70% 86% at 50% 48%,#000 20%,#000b 54%,transparent 100%);
+}
+
+.hero[data-reference-hero][data-drawing='engraving'] .reference-hand-left {transform:translateX(-2.5%)}
+.hero[data-reference-hero][data-drawing='engraving'] .reference-hand-right {transform:translateX(2.5%)}
+
+/* Fine paper grain for the hero; its drafting lines remain above the paper. */
+.silver-landing .replay-site.site-home .hero[data-reference-hero] {
+  background-color: #fcfcfb;
+  background-image: repeating-linear-gradient(105deg, transparent 0 3px, rgba(71,88,96,.025) 3px 4px), repeating-linear-gradient(15deg, transparent 0 5px, rgba(71,88,96,.018) 5px 6px);
+}
+.hero[data-reference-hero][data-drawing] .reference-cloud { display:none !important; }
+
+.hero[data-reference-hero] .reference-hand-motion { animation: none !important; }
+
+.clockwork-story[data-hero-style='warm'][data-phase='hero'] .silver-geometry-blueprint, .clockwork-story[data-hero-style='warm'][data-phase='opening'] .silver-geometry-blueprint { z-index:0; }
+
+/* Monochrome illustrated opening. */
+.silver-landing .replay-site.site-home .hero[data-reference-hero] {
+  --hero-scene-bg: #08090b;
+  background-color: var(--hero-scene-bg);
+  background-image: url('/assets/atmosphere/hero-film-grain.webp');
+  background-size: 192px 192px;
+}
+.silver-landing .hero[data-reference-hero] #hero-heading span {color:#f5f5f2!important}
+.silver-landing .hero[data-reference-hero] #hero-heading em {color:#d8b17b!important}
+.hero[data-reference-hero] .silver-geometry-blueprint {color:#fff!important;opacity:.65!important}
+.hero[data-reference-hero] .silver-geometry-blueprint :is([data-blueprint-line],[data-blueprint-ray]) {stroke:#fff!important;stroke-opacity:.24}
+.hero[data-reference-hero] .hero-booking-link {background:#f5f5f2!important;color:#151718!important;border-color:#f5f5f2!important}
+.hero[data-reference-hero] > .hero-scroll-link {color:#dce1e5!important;border-color:#ffffff40}
+.site-home:has(.clockwork-story[data-hero-surface='warm']) > .site-header :is(.desktop-nav a,.mobile-menu-trigger,.wordmark) {color:#f5f5f2!important}
+.silver-landing .site-home:has(.clockwork-story[data-hero-surface='warm']) > .site-header .pp-mark-solid {filter:brightness(0) invert(1)!important}
+.site-home:has(.clockwork-story[data-hero-surface='warm']) > .site-header .header-contact {background:#f5f5f2!important;color:#151718!important}
+.home-career-band {position:relative;background:#eceef0;padding:28px 0;border-block:1px dashed #8999a34d;color:#52636c}
+.home-career-band::before {content:'';position:absolute;inset:0 var(--replay-frame);border-inline:1px dashed #8999a34d;pointer-events:none;z-index:3}
+.home-career-band > p {text-align:center;font:400 10px/1.5 'Geist Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin:0 24px 20px}
+.home-career-band .brand-marquee {
+  position: relative !important;
+  inset: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: calc(100% - 2 * var(--replay-frame));
+  margin-inline: auto;
+}
+.home-career-band .brand-marquee .currency-ribbon-window {
+  --career-fade: clamp(24px, 7vw, 100px);
+  container-type: inline-size;
+  mask-image: linear-gradient(90deg, transparent, #000 var(--career-fade), #000 calc(100% - var(--career-fade)), transparent);
+}
+.home-career-band .currency-ribbon-set { min-width: 100cqi; justify-content: space-around; }
+.home-career-band .brand-marquee-item {color:#344954;opacity:1}
+.replay-site .home-career-band .brand-marquee .employer-logo {filter:brightness(0) saturate(0)!important;opacity:.8}
+@media (prefers-reduced-motion: reduce) {
+  .home-career-band .brand-marquee .currency-ribbon-window { mask-image: none; }
+  .home-career-band .currency-ribbon-track { width: 100%; }
+  .home-career-band .currency-ribbon-set { width: 100%; flex-wrap: wrap; }
+  .home-career-band .currency-ribbon-set[aria-hidden='true'] { display: none; }
+  .home-career-band .brand-marquee .brand-marquee-item { flex: 1 1 134px; width: auto; height: 64px; padding-inline: 10px; }
+}

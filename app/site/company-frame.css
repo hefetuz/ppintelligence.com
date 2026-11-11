@@ -1,0 +1,31 @@
+/* One outer datum and one content inset across all paper chapters. */
+.company-story {--company-content-inset:clamp(24px,4vw,64px)}
+.company-story .deniz-profile {
+  padding-inline:calc(var(--replay-frame) + var(--company-content-inset));
+}
+html[data-company-surface='perspective'] .company-story .classical-preview .company-decision-frame {
+  width:var(--preview-grid-step,calc(100% - 2 * var(--replay-frame)));max-width:none;margin-inline:auto;
+}
+.company-story .classical-preview .company-decision-frame::before {inset-inline:var(--company-content-inset)}
+.company-story .classical-preview .company-decision-heading {padding-inline:var(--company-content-inset)}
+@media (min-width: 1024px) {
+  .company-story .classical-preview .company-decision-heading {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0;
+  }
+  .company-story .classical-preview .company-decision-heading h2 {padding-inline-end:32px}
+  .company-story .classical-preview .company-decision-copy {
+    border-inline-start:1px dashed var(--decision-rule);
+    padding-inline-start:32px;
+  }
+}
+@media (max-width: 1023px) {
+  .company-story .classical-preview .company-decision-frame::before {display:none}
+}
+html[data-company-surface='perspective'] .company-story .classical-preview .founder-panel {padding-inline:0}
+html[data-company-surface='perspective'] .company-story .classical-preview .founder-panel__frame {
+  width:var(--preview-grid-step,calc(100% - 2 * var(--replay-frame)))!important;
+  max-width:none!important;margin:0 0 0 var(--preview-grid-origin,var(--replay-frame))!important;
+  padding-inline:var(--company-content-inset);box-sizing:border-box;
+}

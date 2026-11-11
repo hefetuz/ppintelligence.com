@@ -1,0 +1,30 @@
+import snapshot from '../../.generated/site-content.json';
+import config from '../../.generated/site-config.json';
+import editorial from '../../.generated/site-editorial.json';
+import type { BaseSitePath, PublicContent } from './content-types';
+import { createRouteRegistry, publicNavigation, resolveSiteRoute } from './routes';
+import { chessEssay, type SpeakingRecord } from './deniz-insights';
+
+export const siteContent = snapshot as PublicContent;
+export const topics = siteContent.topics;
+export const publishedExpertise = siteContent.expertise;
+export const cmsManaged = editorial.managed;
+export const editorialSpeaking = editorial.speaking as SpeakingRecord[];
+export const insights = cmsManaged || siteContent.insights.some(record => record.id === chessEssay.id)
+  ? siteContent.insights : [...siteContent.insights, chessEssay];
+export const team = siteContent.team;
+export const founder = siteContent.founder;
+export const logos = siteContent.logos;
+export const ventures = siteContent.ventures;
+export const references = siteContent.references;
+export const engagements = siteContent.engagements.map((item, index) => ({ ...item, number: String(index + 1).padStart(2, '0') }));
+export const contact = siteContent.contact;
+export const pageCopy = siteContent.pageCopy ?? {};
+export const socialLinks = siteContent.socialLinks ?? {};
+export const BOOKING_URL = contact.bookingUrl;
+export const COMPANY_LINKEDIN = contact.companyLinkedIn;
+export const routes = createRouteRegistry({ ...siteContent, insights });
+export const navigation = publicNavigation(routes, siteContent);
+export const pageMeta = Object.fromEntries(Object.entries(routes).map(([path, route]) => [path, { title: route.title, description: route.description, robots: { index: config.indexable && !route.noindex, follow: config.indexable && !route.noindex } }]));
+export type SitePath = BaseSitePath;
+export const resolvePath = (pathname: string) => resolveSiteRoute(pathname, routes)?.active ?? null;

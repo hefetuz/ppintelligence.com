@@ -1,0 +1,82 @@
+/* Opt-in legacy-brand palette. No layout, type, animation or geometry overrides. */
+html[data-brand="heritage"] {
+  color-scheme: light;
+  --brand-navy: #082b5c;
+  --brand-gold: #d7ad4d;
+  --brand-gold-ink: #856015;
+  --brand-surface: #eef1f4;
+  --ink: #faf9f5;
+  --paper: var(--brand-navy);
+  --penny: var(--brand-gold-ink);
+  --silver: #47576d;
+  --smoke: #52647b;
+  --hairline: #082b5c26;
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --primary: var(--brand-gold);
+  --primary-foreground: var(--brand-navy);
+  --muted: #e6ebf1;
+  --muted-foreground: var(--silver);
+  --border: var(--hairline);
+  --ring: var(--brand-gold-ink);
+}
+html[data-brand="heritage"] body { color: var(--paper); }
+html[data-brand="heritage"] .hero {
+  color-scheme: dark;
+  --hero-scene-bg: #082b5c;
+  --ink: var(--brand-navy);
+  --paper: #fffdf8;
+  --penny: var(--brand-gold);
+  --silver: #dae1ec;
+  --smoke: #b9c8dd;
+  --muted: #174272;
+  --hairline: #fffdf82b;
+  --ring: var(--brand-gold);
+  color: var(--paper);
+  background: var(--ink);
+}
+html[data-brand="heritage"] .artwork::after {
+  background: linear-gradient(to bottom, #082b5c00, #082b5c18 45%, #082b5c8a 77%, #082b5cf5);
+}
+html[data-brand="heritage"] .hero-booking-link {
+  background-color: #082b5ce8;
+  border-color: #d7ad4d99;
+  box-shadow: none;
+}
+html[data-brand="heritage"] .hero-motion-control[aria-pressed="true"] { border-color: #d7ad4d80; }
+html[data-brand="heritage"] .identity .pp-mark,
+html[data-brand="heritage"] .about-monogram img { content: url('/pp-logo-navy.svg'); }
+html[data-brand="heritage"] .hero .identity .pp-mark { content: url('/pp-logo.svg'); }
+html[data-brand="heritage"] .site-home .landing-approach,
+html[data-brand="heritage"] .name-story,
+html[data-brand="heritage"] .booking-panel,
+html[data-brand="heritage"] .engagements-section { background: var(--brand-surface); border-color: var(--hairline); }
+html[data-brand="heritage"] .site-home .expertise-service,
+html[data-brand="heritage"] .site-home .landing-principles { border-color: var(--hairline); }
+html[data-brand="heritage"] .primary-cta {
+  background: var(--brand-gold);
+  color: var(--brand-navy);
+  border-color: #b78a31;
+  box-shadow: none;
+}
+html[data-brand="heritage"] .cta-arrow { border-color: #082b5c26; }
+html[data-brand="heritage"] .primary-cta::before { display: none; }
+html[data-brand="heritage"] .text-link { border-color: #85601566; }
+html[data-brand="heritage"] .hairline-figure {
+  --hairline-plate: var(--ink);
+  --hairline-hi: var(--brand-navy);
+  --hairline-edge: #3d597a;
+  --hairline-mid: #667c96;
+  --hairline-lo: #a8b7c7;
+}
+html[data-brand="heritage"] .name-story .hairline-figure { --hairline-plate: var(--brand-surface); }
+html[data-brand="heritage"] .hairline-figure--compass .hairline-rest { content: url('/illustrations/compass-heritage.svg'); }
+html[data-brand="heritage"] .hairline-figure--perspective-sculpture .hairline-rest { content: url('/illustrations/perspective-sculpture-heritage.svg'); }
+html[data-brand="heritage"] .hairline-figure--possibility-kaleidoscope .hairline-rest { content: url('/illustrations/possibility-kaleidoscope-heritage.svg'); }
+html[data-brand="heritage"] .hairline-figure--worktable .hairline-rest { content: url('/illustrations/worktable-heritage.svg'); }
+html[data-brand="heritage"] .hairline-figure--reading-rack .hairline-rest { content: url('/illustrations/reading-rack-heritage.svg'); }
+html[data-brand="heritage"] .hairline-figure--value-transmission .hairline-rest { content: url('/illustrations/value-transmission-heritage.svg'); }
+@media (hover: hover) and (pointer: fine) {
+  html[data-brand="heritage"] .hero-booking-link:hover { background-color: #174272; border-color: var(--penny); }
+  html[data-brand="heritage"] .primary-cta:hover { background: #e4bd63; }
+}

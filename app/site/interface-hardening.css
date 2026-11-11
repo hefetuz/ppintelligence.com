@@ -1,0 +1,48 @@
+/* Shared platform and access fixes, using the existing paper/ink palette. */
+:root {
+  --control-rule:#71818b;
+  --focus-on-paper:#365d70;
+  --nav-announcement-height:calc(32px + env(safe-area-inset-top,0px));
+}
+html {scroll-padding-block-start:calc(var(--nav-announcement-height,32px) + 104px);-webkit-text-size-adjust:100%}
+.replay-site :is(#meet-deniz,#ventures,#approach,#about-pretty-penny,#publications,#speaking,#podcasts,#introduction,#founder,#audience,#inside-the-penny) {scroll-margin-block-start:16px}
+.replay-site.site-page .site-header :is(.desktop-nav a,.mobile-menu-trigger) {color:#4f595a}
+.replay-site.site-page .site-header .pp-mark-solid {filter:brightness(0)}
+.replay-site .podcast-announcement {height:var(--nav-announcement-height);padding-block-start:env(safe-area-inset-top,0px);box-sizing:border-box}
+.podcast-announcement .podcast-announcement__close {top:env(safe-area-inset-top,0px)}
+.replay-site :is(button,summary,[role='button'],input,select,textarea) {touch-action:manipulation}
+.replay-site :is(button,summary,[role='button']) {-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.replay-site :is(button,summary,[role='button']):active {opacity:.8}
+.replay-site :is(button[disabled],button[aria-disabled='true']):active {opacity:1;transform:none}
+.replay-site .mobile-navigation--inline .mobile-navigation__body {overflow-y:auto;overscroll-behavior:contain;padding-block-end:calc(20px + env(safe-area-inset-bottom,0px))}
+.replay-site .site-header[data-keyboard-menu='true'] :is(.mobile-navigation--inline,.mobile-navigation__hamburger span) {transition:none!important}
+@media(prefers-reduced-motion:reduce) {
+ .replay-site .site-header :is(.mobile-navigation--inline,.mobile-navigation__hamburger span) {transition:none!important}
+ html {scroll-behavior:auto!important}
+ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*) {animation:none!important}
+}
+@media(pointer:coarse),(max-width:639px) {
+ html .replay-site.replay-site :is(input,select,textarea) {font-size:1rem}
+}
+.replay-site .insights-search input,.replay-site .insights-filters select,
+.replay-site .contact-message-form :is(input,select,textarea) {border-color:var(--control-rule)}
+.replay-site :is(.insights-results,.insights-entry__date,.blog-archive__count) {font-variant-numeric:tabular-nums}
+.replay-site .insights-page .insights-entry h3,.replay-site .insight-card h3 {line-height:1.4}
+.replay-site .insight-card {max-width:100%;overflow-wrap:anywhere}
+.replay-site .insight-card>* {min-width:0;max-width:100%}
+.replay-site .insight-card h3 {color:#27353d;overflow-wrap:anywhere}
+.replay-site .insight-card :is(.card-index,.insight-attribution),
+.replay-site .insight-card>p:not(.card-index):not(.insight-attribution) {color:#53646e;max-width:68ch}
+.replay-site .insight-card .card-link {color:#365d70;text-decoration-color:currentColor;overflow-wrap:anywhere}
+.replay-site .insight-card a:focus-visible {outline:2px solid var(--focus-on-paper);outline-offset:4px}
+.replay-site .contact-message-form .contact-message-required-note,
+.replay-site .contact-message-form .contact-message-delivery-note {font-size:var(--type-footnote);line-height:1.6;color:#53646e;max-width:68ch}
+.replay-site .contact-message-form .contact-message-field-error {font-size:var(--type-footnote);line-height:1.5;color:#8b3028}
+.replay-site .contact-message-form :is(input,textarea)[aria-invalid='true'] {border-color:#8b3028;border-style:solid}
+.replay-site .contact-message-form :is(.contact-message-success,.contact-message-error):empty {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.replay-site .contact-message-form>button[aria-disabled='true'] {cursor:wait;opacity:.7}
+.replay-site .contact-message-form :is(.contact-message-success,.contact-message-error) a {text-decoration:underline;text-underline-offset:3px}
+html[data-site-motion-paused='true'] .site-home .founder-scholar {animation-play-state:paused}
+@media(forced-colors:active) {
+ .replay-site :is(a,button,summary,input,select,textarea):focus-visible {outline:2px solid Highlight}
+}

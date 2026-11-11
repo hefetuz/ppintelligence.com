@@ -1,0 +1,391 @@
+.conversation-page {
+  background: #0a1118;
+  color: var(--paper);
+  padding-inline: clamp(24px, 6.5vw, 120px);
+}
+.conversation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(40px, 6vw, 100px);
+  padding-block: 38px 56px;
+  align-items: start;
+}
+.conversation-introduction {
+  padding-block: 22px;
+  min-width: 0;
+}
+.conversation-overline {
+  margin: 0 0 28px;
+  color: #b9c4cd;
+  font:var(--type-caption-2)/1.6 "Geist Mono",
+    monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.conversation-introduction h1 {
+  font:400 var(--type-display-size)/0.98 "Geist Serif", serif;
+  letter-spacing: -0.035em;
+  margin: 0;
+}
+.conversation-introduction h1 em {
+  display: inline-block;
+  color: var(--penny);
+  padding-bottom: 0.1em;
+  font-weight: 400;
+}
+.conversation-intro {
+  margin: 22px 0 0;
+  max-width: 29ch;
+  font:400 var(--type-title-2)/1.35 "Geist Serif", serif;
+  text-wrap: pretty;
+}
+.conversation-description {
+  margin: 20px 0 0;
+  color: #b9c4ce;
+  font-size:var(--type-footnote);
+  line-height: 1.9;
+  max-width: 42ch;
+}
+.conversation-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-block: 23px;
+  margin: 28px 0 0;
+  border-block: 1px solid #b9bcbf30;
+}
+.conversation-facts > div {
+  min-width: 62px;
+}
+.conversation-facts dt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #a6b3bf;
+  font-size:var(--type-caption-2);
+  line-height: 1.6;
+}
+.conversation-facts dd {
+  margin: 10px 0 0;
+  font-size:var(--type-caption-1);
+  color: var(--paper);
+}
+.conversation-agenda {
+  margin-top: 28px;
+}
+.conversation-agenda h2 {
+  margin: 0;
+  font:400 var(--type-title-1)/1.2 "Geist Serif", serif;
+}
+.conversation-agenda p {
+  margin: 12px 0 0;
+  color: #b9c4ce;
+  font-size:var(--type-caption-1);
+  line-height: 1.8;
+  max-width: 42ch;
+}
+.conversation-agenda p:last-child {
+  color: #a2afba;
+  font-size:var(--type-caption-2);
+}
+.conversation-direct {
+  margin-top: 34px;
+}
+.conversation-direct > span {
+  display: block;
+  color: #a6b3bf;
+  font-size:var(--type-caption-2);
+  margin-bottom: 5px;
+}
+.conversation-direct a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  font-size:var(--type-caption-2);
+  color: var(--paper);
+}
+.conversation-direct a > span {
+  overflow-wrap: anywhere;
+}
+.conversation-direct a > svg {
+  flex-shrink: 0;
+}
+.conversation-direct a:hover {
+  color: var(--penny);
+}
+.conversation-booking {
+  min-width: 0;
+  background: #101b25;
+  border: 1px solid #b9bcbf32;
+  scroll-margin-top: 100px;
+}
+.conversation-booking-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 28px;
+  border-bottom: 1px solid #b9bcbf26;
+}
+.conversation-booking-heading h2 {
+  margin: 0;
+  font:400 var(--type-title-1)/1.1 "Geist Serif", serif;
+}
+.conversation-booking-heading > span {
+  color: #afbbc6;
+  font-size:var(--type-caption-2);
+}
+.contact-calendar-frame {
+  position: relative;
+  min-height: 650px;
+}
+.contact-calendar-frame iframe {
+  width: 100%;
+  height: 650px;
+  border: 0;
+  display: block;
+  color-scheme: dark;
+}
+.contact-calendar-loading {
+  position: absolute;
+  top: 45px;
+  left: 9%;
+  right: 9%;
+  padding: 22px;
+  color: var(--silver);
+  z-index: 1;
+  pointer-events: none;
+}
+.contact-calendar-loading output {
+  display: block;
+  font-size:var(--type-caption-1);
+  line-height: 1.8;
+  margin-top: 28px;
+}
+.calendar-loading-lines {
+  display: grid;
+  gap: 16px;
+}
+.calendar-loading-lines i {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background: #b9bcbf28;
+}
+.calendar-loading-lines i:nth-child(2) {
+  width: 70%;
+}
+.calendar-loading-lines i:nth-child(3) {
+  width: 85%;
+}
+.contact-calendar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 12px 24px;
+  border-top: 1px solid #b9bcbf26;
+  color: #a6b3bf;
+  font-size:var(--type-caption-2);
+}
+.contact-calendar-fallback a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  color: var(--paper);
+}
+.contact-calendar-fallback a:hover {
+  color: var(--penny);
+}
+.conversation-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding-block: 24px 30px;
+  border-top: 1px solid #b9bcbf26;
+  font-size:var(--type-caption-2);
+  color: #9eacb9;
+  line-height: 1.8;
+}
+.conversation-bottom a {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: #c4cdd5;
+}
+@media (max-width: 1100px) {
+  .conversation-page {
+    padding-inline: 36px;
+  }
+  .conversation-layout {
+    gap: 32px;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  }
+  .conversation-introduction h1 {
+    font-size:var(--type-display-size);
+  }
+  .conversation-booking-heading {
+    padding-inline: 20px;
+  }
+  .conversation-facts {
+    gap: 17px;
+  }
+}
+@media (max-width: 760px) {
+  .conversation-page {
+    padding-inline: 24px;
+  }
+  .conversation-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+    padding-block: 30px 40px;
+  }
+  .conversation-introduction {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+  }
+  .conversation-overline {
+    margin-bottom: 20px;
+    font-size:var(--type-caption-2);
+  }
+  .conversation-introduction h1 {
+    font-size:var(--type-display-size);
+  }
+  .conversation-introduction h1 br {
+    display: none;
+  }
+  .conversation-introduction h1 em::before {
+    content: ' ';
+    white-space: pre;
+  }
+  .conversation-intro {
+    font-size:var(--type-title-2);
+    max-width: 30ch;
+    margin-top: 16px;
+  }
+  .conversation-description {
+    font-size:var(--type-caption-1);
+    max-width: 50ch;
+    margin-top: 16px;
+  }
+  .conversation-facts {
+    margin-top: 22px;
+    padding-block: 18px;
+    gap: 32px;
+  }
+  .conversation-agenda {
+    margin-top: 22px;
+  }
+  .conversation-agenda p {
+    max-width: 50ch;
+  }
+  .conversation-direct {
+    margin-top: 18px;
+  }
+  .contact-calendar-frame,
+  .contact-calendar-frame iframe {
+    min-height: 720px;
+    height: 720px;
+  }
+  .conversation-bottom {
+    display: block;
+  }
+  .conversation-bottom a {
+    margin-top: 12px;
+  }
+  .conversation-booking-heading {
+    padding: 20px;
+  }
+  .contact-calendar-fallback {
+    padding-inline: 18px;
+  }
+}
+@media (max-width: 380px) {
+  .conversation-page {
+    padding-inline: 16px;
+  }
+  .conversation-introduction h1 {
+    font-size:var(--type-display-size);
+  }
+  .conversation-introduction h1 br {
+    display: block;
+  }
+  .conversation-introduction h1 em::before {
+    content: none;
+  }
+  .conversation-facts {
+    gap: 26px;
+  }
+  .conversation-booking-heading {
+    padding-inline: 16px;
+  }
+  .conversation-booking-heading h2 {
+    font-size:var(--type-title-1);
+  }
+}
+.conversation-afterword {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  padding-block: 0 48px;
+}
+.conversation-afterword .conversation-agenda,
+.conversation-afterword .conversation-direct {
+  margin-top: 0;
+}
+@media (max-width: 760px) {
+  .conversation-afterword {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .conversation-introduction h1 {
+    font-size:var(--type-display-size);
+  }
+  .conversation-intro {
+    font-size:var(--type-title-3);
+  }
+}
+/* Give the provider's native white calendar a deliberate paper frame. */
+.conversation-booking {
+  background: #fff;
+  color: #14212b;
+  border-color: #fff;
+}
+.conversation-booking-heading {
+  background: #f3f0e8;
+  border-color: #14212b20;
+}
+.conversation-booking-heading > span {
+  color: #52616b;
+}
+.contact-calendar-frame,
+.contact-calendar-frame iframe {
+  min-height: 760px;
+  height: 760px;
+  color-scheme: light;
+}
+.contact-calendar-loading {
+  color: #52616b;
+}
+.calendar-loading-lines i {
+  background: #14212b25;
+}
+.contact-calendar-fallback {
+  background: #f3f0e8;
+  border-color: #14212b20;
+  color: #52616b;
+}
+.contact-calendar-fallback a {
+  color: #14212b;
+}
+.contact-calendar-fallback a:hover {
+  color: #805b31;
+}

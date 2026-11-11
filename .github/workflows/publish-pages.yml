@@ -1,0 +1,70 @@
+name: Publish website content
+
+on:
+  push:
+    branches: [site-source]
+  schedule:
+    - cron: '3-58/5 * * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [cms-publish]
+
+concurrency:
+  group: github-pages-content
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.revision.outputs.changed }}
+    env:
+      CONTENT_MODE: sanity
+      SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_DATASET: ${{ vars.SANITY_DATASET }}
+      SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
+      SITE_ORIGIN: https://prettypennyintelligence.com
+      SITE_ENV: production
+      ENABLE_INDEXING: 'true'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check published content
+        id: revision
+        run: node scripts/cms-revision.mjs
+      - uses: pnpm/action-setup@v4
+        if: steps.revision.outputs.changed == 'true'
+        with:
+          version: 10
+      - run: pnpm install --frozen-lockfile
+        if: steps.revision.outputs.changed == 'true'
+      - run: pnpm run build:preview
+        if: steps.revision.outputs.changed == 'true'
+      - name: Preserve custom domain
+        if: steps.revision.outputs.changed == 'true'
+        run: |
+          printf '%s\n' 'prettypennyintelligence.com' > dist-presentation/CNAME
+          touch dist-presentation/.nojekyll
+          cp .generated/content-revision.json dist-presentation/content-revision.json
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.revision.outputs.changed == 'true'
+        with:
+          path: dist-presentation
+  deploy:
+    needs: build
+    if: needs.build.outputs.changed == 'true' && vars.CMS_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

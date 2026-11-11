@@ -1,0 +1,96 @@
+/* The opening and page share one handoff, without changing document geometry. */
+html:has(.site-home[data-entrance]) { scrollbar-gutter: stable; }
+.site-home[data-entrance] {
+  --entrance-ease: cubic-bezier(.23, 1, .32, 1);
+  --stagger-dur: 280ms;
+  --stagger-distance: 8px;
+  --stagger-stagger: 55ms;
+}
+html.pp-intro-active, html.pp-intro-active body { overflow-y: hidden; overscroll-behavior: none; }
+.hero-intro-canvas { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+.hero-intro-canvas[hidden] { display: none; }
+.intro-loading-mark { display: none; }
+.site-home[data-entrance='intro'] .intro-loading-mark {
+  position: fixed; inset: 0; z-index: 61; display: grid; place-items: center;
+  pointer-events: none; color: var(--penny); font:400 var(--type-display-size)/1 "Geist Serif", serif;
+}
+.intro-loading-mark span { position: absolute; opacity: .8; }
+.intro-loading-mark span:nth-child(1) { transform: translate(-24vw, -8vh); }
+.intro-loading-mark span:nth-child(2) { transform: translate(0, -16vh); }
+.intro-loading-mark span:nth-child(3) { transform: translate(24vw, -8vh); }
+.intro-loading-mark span:nth-child(4) { transform: translate(24vw, 8vh); }
+.intro-loading-mark span:nth-child(5) { transform: translate(0, 16vh); }
+.intro-loading-mark span:nth-child(6) { transform: translate(-24vw, 8vh); }
+.site-home:has(.hand-canvas[data-rendered='true']) .intro-loading-mark { display: none; }
+.site-home[data-entrance='intro'] :is(.site-header, .site-footer, .art-cursor, .hero-title, .brand-marquee, .hero-scene-controls, .hero-static-art),
+.site-home[data-entrance='intro'] main > :not(.hero),
+.site-home[data-entrance='intro']::before,
+.site-home[data-entrance='intro'] .hero::before {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+.site-home[data-entrance='intro'] :is(.site-header, .hero-title, .hero-scene-controls) * {
+  visibility: hidden; transition: none; animation: none;
+}
+.site-home[data-entrance] .intro-caption {
+  position: fixed; inset: auto 24px 20px auto; z-index: 65;
+  width: auto; text-align: right;
+}
+/* The intro is visually alone; its skip action is available to keyboard users. */
+.site-home[data-entrance] .skip-intro { opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
+.site-home[data-entrance] .skip-intro:focus-visible { opacity: 1; pointer-events: auto; }
+.site-home[data-entrance='ready'] .site-header { animation: entrance-fade 240ms var(--entrance-ease) both; }
+.site-home[data-entrance='ready'] .site-header > * { animation: entrance-rise 240ms var(--entrance-ease) both; }
+.site-home[data-entrance='ready'] .site-header > :nth-child(2) { animation-delay: 55ms; }
+.site-home[data-entrance='ready'] .site-header > :nth-child(3) { animation-delay: 110ms; }
+.site-home[data-entrance='ready'] .site-header > :nth-child(4) { animation-delay: 165ms; }
+.site-home[data-entrance] .hero-title .t-stagger-line { transition-duration: 280ms; }
+.site-home[data-entrance] .hero-title .t-stagger-line--1 { transition-delay: 55ms; }
+.site-home[data-entrance] .hero-title .t-stagger-line--2 { transition-delay: 110ms; }
+.site-home[data-entrance] .hero-title .t-stagger-line--3 { transition-delay: 165ms; }
+.site-home[data-entrance='intro'] :is(.hero-booking-prompt, .hero-booking-link, .hero-booking-detail, .hero-explore-link) { opacity: 0; transform: translateY(8px); }
+.site-home[data-entrance='ready'] .hero-booking-prompt { animation: entrance-rise 280ms 220ms var(--entrance-ease) both; }
+.site-home[data-entrance='ready'] .hero-booking-link { animation: entrance-rise 280ms 275ms var(--entrance-ease) backwards; }
+.site-home[data-entrance='ready'] .hero-booking-detail { animation: entrance-rise 280ms 330ms var(--entrance-ease) both; }
+.site-home[data-entrance='ready'] .hero-explore-link { animation: entrance-rise 280ms 385ms var(--entrance-ease) backwards; }
+.site-home[data-entrance='ready'] :is(.brand-marquee, .hero-scene-controls) { animation: entrance-fade 280ms 330ms var(--entrance-ease) both; }
+.site-home[data-entrance='ready']::before,
+.site-home[data-entrance='ready'] .hero::before { animation: entrance-fade 280ms var(--entrance-ease) backwards; }
+.site-home [data-reveal='pending'] { opacity: 0; transform: translateY(8px); }
+.site-home [data-reveal='shown'] { animation: entrance-rise 280ms var(--entrance-ease) both; }
+.site-home [data-reveal-instant='true'] { animation: none; opacity: 1; transform: none; }
+@keyframes entrance-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes entrance-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .site-home[data-entrance] *, .site-home[data-entrance]::before, .site-home[data-entrance] .hero::before { animation: none !important; transition: none !important; }
+  .site-home [data-reveal] { opacity: 1; transform: none; }
+  .site-home[data-entrance] .hero-title .t-stagger-line { transform: none; }
+  .site-home .intro-loading-mark { display: none !important; }
+  .site-home[data-entrance='intro'] :is(.site-header, .site-footer, .hero-title, .brand-marquee, .hero-static-art),
+  .site-home[data-entrance='intro'] main > :not(.hero) { opacity: 1; visibility: visible; pointer-events: auto; }
+  .site-home[data-entrance='intro'] :is(.site-header, .hero-title, .hero-scene-controls) * { visibility: visible; }
+  .site-home[data-entrance='intro'] :is(.hero-booking-prompt, .hero-booking-link, .hero-booking-detail, .hero-explore-link, .t-stagger-line) { opacity: 1; transform: none; }
+  .site-home[data-entrance='intro'] :is(.hero-intro-canvas, .intro-caption) { display: none; }
+}
+
+/* The package owns the copy reveal, so the earlier rise/stagger cannot compete. */
+.site-home[data-entrance='ready'] .hero-title .t-stagger-line {animation:none;transition:none;transform:none}
+.site-home[data-entrance='ready'] .hero-title[data-copy-reveal='waiting'] {opacity:0}
+.site-home .hero-title {--ascii-accent:#dac299;--ascii-glyph:#e5e8eb;--ascii-surface:#101c29;--ascii-font:'Geist Mono',monospace}
+
+.site-home[data-entrance='intro'] :is(.podcast-announcement, .hero-scroll-link) { visibility: hidden !important; pointer-events: none !important; }
+
+.site-home[data-entrance='ready'] .site-header, .site-home[data-entrance='ready'] .site-header > *, .site-home[data-entrance='ready'] .hero-scroll-link { animation: none; }
+
+@keyframes chrome-focus-in { from { opacity: 0; filter: blur(7px); } to { opacity: 1; filter: blur(0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .site-home[data-entrance='ready'] :is(.site-header, .podcast-announcement, .hero-scroll-link) { animation: chrome-focus-in 650ms cubic-bezier(.22, 1, .36, 1) both; }
+  .site-home[data-entrance='ready'] .site-header > * { animation: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) { .replay-site.site-home[data-entrance='ready'] .site-header { animation: chrome-focus-in 650ms cubic-bezier(.22,1,.36,1) both !important; } }
+
+/* Title and CTA enter together after the coin and hands settle. */
+@media (prefers-reduced-motion: no-preference) {
+  .site-home[data-entrance='ready'] .hero-title { animation: chrome-focus-in 650ms cubic-bezier(.22,1,.36,1) backwards; }
+  .site-home[data-entrance='ready'] .hero-title .hero-booking-link { animation: none; }
+}

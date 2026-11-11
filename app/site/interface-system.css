@@ -1,0 +1,163 @@
+/* Shared typography and rhythm from the requested reference. */
+.replay-site {
+  --editorial-face: "Geist Serif", serif;
+  --reading-face: Geist, "Geist Fallback", sans-serif;
+  --label-face: "Geist Mono", "Geist Mono Fallback", monospace;
+  --editorial-ink: #20282b;
+  --editorial-muted: #56636b;
+  --editorial-rule: #89949d70;
+  --editorial-display:clamp(2.5rem,5vw,4.5rem);
+  --editorial-section:clamp(2rem,3.5vw,2.75rem);
+  --editorial-card:1.625rem;
+  --editorial-body:1rem;
+  --editorial-control:1rem;
+  --editorial-label:.6875rem;
+}
+.replay-site.site-page :is(.company-centered-hero h1,.contact-editorial h1,.blog-index h1) {
+  font-family:var(--editorial-face);font-weight:400;
+  letter-spacing:-.04em;line-height:1.02;text-wrap:balance;
+}
+.replay-site .company-centered-hero h1 {font-size:var(--editorial-display)}
+.replay-site :is(.hero-title h1,.founder-identity h2,.company-value h3,.landing-footer-column h2,.contact-message-form h2) {font-family:var(--editorial-face);font-weight:400;letter-spacing:-.025em}
+.replay-site .company-value h3 {font-size:var(--type-title-1);line-height:1.1}
+.replay-site .landing-footer-column h2 {font-size:var(--type-title-3);line-height:1.2}
+.replay-site :is(.company-decision-heading h2,.work-phases h2,.company-values h2,.contact-faq h2,.blog-archive__sidebar h2) {
+  font-family:var(--editorial-face);font-weight:400;
+  font-size:var(--editorial-section);line-height:1.04;letter-spacing:-.025em;
+}
+.replay-site :is(.company-decision-copy,.work-phases__details p,.company-value p,.contact-editorial__lead,.blog-featured__items p,.blog-archive__row p) {
+  font-family:var(--reading-face);font-size:var(--editorial-body);line-height:1.5;letter-spacing:-.02em;
+}
+/* Explicit CTA family: filters, disclosures and icon-only controls keep their roles. */
+.replay-site :is(.header-contact,.hero-booking-link,.founder-profile-action>a,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-copy>a,.company-centered-hero__content>a) {
+  display:inline-flex;justify-content:center;align-items:center;gap:0;
+  font-family:var(--editorial-face);font-weight:500;font-size:var(--editorial-control);line-height:1.2;letter-spacing:.01em;
+  min-height:52px;padding:14px 28px;border-radius:0;text-align:center;text-decoration:none;
+  transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease;
+}
+.replay-site .header-contact {min-height:40px;padding:12px 20px;font-size:var(--type-caption-1);line-height:16px}
+.replay-site.site-page .site-header .header-contact {background:#20282b;color:#fff}
+.replay-site :is(.contact-message-form>button,.work-phases__cta,.company-centered-hero__content>a) {background:#20282b;color:#fff;border:1px solid #20282b}
+.replay-site .contact-book-call {background:transparent;color:#26383f;border:1px solid #89949d;min-height:44px;padding:10px 22px;font-size:var(--type-footnote)}
+@media(hover:hover){
+  .replay-site :is(.contact-message-form>button,.work-phases__cta,.company-centered-hero__content>a):hover {background:#3e4a4f;border-color:#3e4a4f}
+  .replay-site .contact-book-call:hover {background:#20282b;color:#fff;border-color:#20282b}
+}
+.replay-site :is(.header-contact,.hero-booking-link,.work-phases__cta,.contact-book-call,.contact-message-form>button):focus-visible {outline:2px solid #8c6840;outline-offset:4px}
+.replay-site .contact-editorial__intro>.contact-editorial__eyebrow {
+  display:inline-flex;width:fit-content;border:1px dashed #89949d70;padding:5px 8px;
+  color:#56636b;font:var(--type-caption-2)/1.5000 var(--label-face);letter-spacing:.08em;
+}
+.replay-site .contact-message-form label {font-size:var(--type-footnote);line-height:1.5;color:#43545e}
+.replay-site .contact-message-form :is(input,select,textarea) {font-size:var(--type-footnote);line-height:1.5}
+.replay-site .contact-message-form label>span,
+.replay-site .contact-editorial__host p,
+.replay-site .contact-editorial__experience>p {color:#56636b;font-size:var(--type-caption-1);line-height:1.5}
+.replay-site .contact-message-form :is(input,textarea)::placeholder {color:#64717a;opacity:1}
+/* Only the ornaments change; the measured wall and floor edges stay intact. */
+.company-story .company-values::before,.company-story .company-values::after {content:none}
+html[data-company-texture='fine'] .decision-room__surfaces img:not(.decision-room__wire) {opacity:0}
+html[data-company-texture='fine'] .decision-room__surfaces::after {
+  content:'';position:absolute;inset:0 0 auto;height:39.736cqw;
+  background:url('/assets/company/previews/penny-engraving.svg') top center/100% 100% no-repeat;
+  opacity:.72;pointer-events:none;
+}
+.company-story .work-phases__stages {gap:16px;align-items:stretch}
+html[data-company-surface='perspective'] .company-story .work-phases__stage {
+  min-width:0;padding:20px 18px 24px;border:1px dashed #89949d70;
+  background:#ffffff10;display:flex;flex-direction:column;
+}
+html[data-company-surface='perspective'] .company-story .work-phases__stage>p {
+  font:var(--editorial-label)/1.5 var(--label-face);letter-spacing:.08em;color:#455761;margin:12px 0;
+}
+html[data-company-surface='perspective'] .company-story .work-phases__note {
+  font:var(--editorial-body)/1.5 var(--reading-face);color:#43545e;letter-spacing:-.02em;
+}
+.company-story .work-phases__drawing {width:100%;max-width:260px;margin:0 auto}
+.company-story .work-phases__details h3 svg {color:#415661;stroke-width:1.6;width:20px;height:20px}
+.replay-site .blog-index__heading {padding:0;background:none}
+.replay-site .blog-index__heading::before,.replay-site .blog-index__heading::after,
+.replay-site .blog-hero__inner::before,.replay-site .blog-hero__inner::after {content:none}
+.replay-site .blog-hero__inner {padding:clamp(64px,8vw,112px) 24px;background:none;border:0}
+.replay-site .blog-index h1 {font-size:var(--editorial-display);margin:0;color:#20282b}
+.replay-site .blog-featured h3 {font:400 var(--editorial-card)/1.15 var(--editorial-face);letter-spacing:-.015em;text-wrap:pretty}
+.replay-site .blog-featured__main h3 {font-size:var(--type-display-small);line-height:1.06;max-width:34ch}
+.replay-site .blog-archive__row a {grid-template-columns:112px minmax(0,1fr);gap:24px}
+.replay-site .blog-archive__row h3 {font:400 var(--type-title-2)/1.2 var(--editorial-face);letter-spacing:-.015em;text-wrap:pretty;overflow-wrap:anywhere}
+.replay-site .blog-archive__date {font-size:var(--type-caption-2);color:#56636b;font-variant-numeric:tabular-nums}
+.replay-site .blog-post__topic,.replay-site .blog-featured__author,.replay-site .blog-archive__count {color:#56636b;font-size:var(--type-caption-2)}
+.replay-site .blog-post__topic svg {width:14px;height:14px;stroke-width:1.5}
+.replay-site .blog-post__topic {overflow-wrap:anywhere;min-width:0}
+.replay-site .blog-featured__author {overflow-wrap:anywhere}
+.replay-site .blog-archive__filters button {min-height:36px;color:#56636b}
+.replay-site .blog-archive__row p {white-space:normal;overflow:visible}
+.replay-site .contact-booking-dialog {overscroll-behavior:contain}
+@media(max-width:1023px){
+  html[data-company-texture='fine'] .decision-room__surfaces::after {height:113.66cqw;background-image:url('/assets/company/previews/penny-engraving-mobile.svg')}
+  .company-story .work-phases__top {gap:32px}
+}
+@media(max-width:639px){
+  .replay-site .contact-message-form :is(input,select,textarea) {font-size:var(--type-callout);line-height:1.5}
+  html[data-company-surface='perspective'] .company-story .work-phases__stage {padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 16px;align-items:center}
+  .company-story .work-phases__stage .work-phases__drawing {grid-column:2;grid-row:1/3;margin:0;width:100%}
+  .company-story .work-phases__stage>p {grid-column:1;grid-row:1;align-self:end}
+  .company-story .work-phases__note {grid-column:1;grid-row:2;align-self:start}
+  .replay-site .blog-archive__row a {grid-template-columns:1fr;gap:8px}
+  .replay-site .blog-featured__items a {min-height:0;padding:28px 24px}
+  .replay-site .blog-featured__author {margin-top:24px}
+  .replay-site .contact-editorial h1 {font-size:var(--type-display-small)}
+}
+@media(prefers-reduced-motion:reduce){.replay-site :is(.header-contact,.hero-booking-link,.founder-profile-action>a,.work-phases__cta,.contact-book-call,.contact-message-form>button){transition:none}}
+
+/* One font system, shared across every route. */
+:root {--font-serif:"Geist Serif",serif;--font-body:Geist,"Geist Fallback",sans-serif;--font-mono:"Geist Mono","Geist Mono Fallback",monospace}
+.replay-site {--editorial-face:var(--font-serif);--reading-face:var(--font-body);--label-face:var(--font-mono);--type-display:var(--font-serif);--type-body:var(--font-body);--type-label:var(--font-mono);--separator-hatch:repeating-linear-gradient(120deg,transparent 0 5px,#71808a30 5px 5.5px,transparent 5.5px 9px);font-family:var(--font-body)}
+.replay-site .site-header nav a {font:400 var(--type-footnote)/1.4286 var(--font-body);letter-spacing:-.025em}
+.replay-site .site-header .header-contact {font:500 var(--type-caption-1)/1.3333 var(--font-serif);padding:12px 20px;letter-spacing:.01em}
+.replay-site :is(.blog-post__topic,.blog-featured__author,.blog-archive__date,.blog-archive__filters,.company-centered-hero__label,.work-phases__heading>p) {font-family:var(--font-mono)}
+.replay-site .blog-hero__inner {background:url('/assets/blog/silver-sky.png') center/cover no-repeat;min-height:300px;display:grid;place-content:center}
+.replay-site .blog-featured::after {background:var(--separator-hatch);height:64px;border-block:1px solid var(--editorial-rule)}
+.replay-site .blog-archive__list::before {background:var(--separator-hatch);width:24px;left:-24px}
+.replay-site .blog-archive__list {padding-left:32px}
+.replay-site .blog-archive__row a {grid-template-columns:100px minmax(0,1fr)}
+.company-story .reference-record-scene {mask-image:linear-gradient(to bottom,#000 0%,#000 72%,#0009 85%,transparent 100%)}
+.company-story .work-phases__top {align-items:stretch}
+.company-story .work-phases__heading {display:flex;flex-direction:column;align-items:flex-start;align-self:stretch;min-height:100%;padding-bottom:0}
+.company-story .work-phases__heading h2 {margin-bottom:24px}
+.company-story .work-phases__heading .work-phases__cta {margin-top:auto}
+.company-story .work-phases__stages {align-items:stretch}
+html[data-company-surface='perspective'] .company-story .work-phases__note {min-height:4.5em;margin-top:auto}
+.silver-landing .replay-site.site-home .hero-booking {margin-top:16px;gap:0}
+.silver-landing .replay-site.site-home .hero-booking-prompt {margin:0}
+.silver-landing .replay-site.site-home .hero-booking-actions {margin-top:32px}
+.silver-landing .hero.scene-ready :is([data-blueprint-line],[data-blueprint-ray]) {animation:none;stroke-dasharray:none;stroke-dashoffset:0}
+.replay-site .contact-editorial__channels,.replay-site .contact-faq {position:relative;margin-top:64px}
+.replay-site .contact-editorial__channels::before,.replay-site .contact-faq::before {content:'';position:absolute;inset-inline:0;top:-64px;height:64px;background:var(--separator-hatch);border-block:1px solid var(--editorial-rule);pointer-events:none}
+@media(min-width:801px){
+.replay-site .contact-editorial__columns {grid-template-columns:minmax(0,1.1fr) 24px minmax(0,1fr);gap:0}
+.replay-site .contact-editorial__intro {grid-column:1;grid-row:1}
+.replay-site .contact-editorial__message {grid-column:3;grid-row:1}
+.replay-site .contact-editorial__columns::before {content:'';grid-column:2;grid-row:1;background:var(--separator-hatch);border-inline:1px solid var(--editorial-rule)}
+}
+@media(max-width:639px){
+.replay-site .blog-archive__row a {grid-template-columns:1fr}
+.replay-site .blog-archive__list {padding-inline:24px}
+.replay-site .blog-archive__list::before {display:none}
+.replay-site .blog-hero__inner {min-height:230px;padding:48px 20px}
+.company-story .work-phases__heading {min-height:0}
+.company-story .work-phases__heading .work-phases__cta {margin-top:0}
+html[data-company-surface='perspective'] .company-story .work-phases__note {min-height:0}
+}
+
+html .silver-landing .replay-site.site-home .hero-booking {margin-top:16px;row-gap:0}
+html .silver-landing .replay-site.site-home .hero-booking-actions {margin-top:40px}
+/* Process cards carry a large illustration and its short label. */
+html[data-company-surface='perspective'] .company-story .work-phases__stage {justify-content:center;padding:24px 12px}
+.company-story .work-phases__stage .work-phases__drawing {max-width:none;width:100%;margin:0}
+.company-story .work-phases__stage .work-phases__drawing .hairline-artwork {aspect-ratio:1;overflow:hidden}
+.company-story .work-phases__stage .work-phases__drawing :is(.hairline-stage,.hairline-rest) {transform:scale(1.55);transform-origin:center}
+html[data-company-surface='perspective'] .company-story .work-phases__stage>p {margin:12px 0 0}
+@media(max-width:639px){
+ html[data-company-surface='perspective'] .company-story .work-phases__stage {display:flex;flex-direction:column;padding:24px}
+ .company-story .work-phases__stage .work-phases__drawing {max-width:300px;grid-column:auto;grid-row:auto}
+}

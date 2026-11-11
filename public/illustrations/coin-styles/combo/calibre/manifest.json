@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "width": 1440,
+  "height": 1320,
+  "origin": [
+    720,
+    660
+  ],
+  "radius": 376.43753266644393,
+  "invitation": "invitation-analysis-overlay.webp",
+  "layers": [
+    {
+      "id": "strategy",
+      "rest": "strategy-rest.webp",
+      "atlas": {
+        "src": "strategy-atlas.webp",
+        "frames": 24,
+        "columns": 6,
+        "rows": 4,
+        "x": 336,
+        "y": 390,
+        "width": 768,
+        "height": 508,
+        "mode": "sweep",
+        "min": 0,
+        "max": 1
+      },
+      "mobileAtlas": {
+        "src": "strategy-atlas-mobile.webp",
+        "frames": 24,
+        "columns": 6,
+        "rows": 4,
+        "x": 336,
+        "y": 390,
+        "width": 768,
+        "height": 508,
+        "mode": "sweep",
+        "min": 0,
+        "max": 1,
+        "pixelScale": 0.5
+      }
+    },
+    {
+      "id": "analysis",
+      "rest": "analysis-rest.webp",
+      "atlas": {
+        "src": "analysis-atlas.webp",
+        "frames": 24,
+        "columns": 6,
+        "rows": 4,
+        "x": 336,
+        "y": 390,
+        "width": 768,
+        "height": 508,
+        "mode": "sweep",
+        "min": 0,
+        "max": 1
+      },
+      "mobileAtlas": {
+        "src": "analysis-atlas-mobile.webp",
+        "frames": 24,
+        "columns": 6,
+        "rows": 4,
+        "x": 336,
+        "y": 390,
+        "width": 768,
+        "height": 508,
+        "mode": "sweep",
+        "min": 0,
+        "max": 1,
+        "pixelScale": 0.5
+      }
+    }
+  ],
+  "animation": {
+    "kind": "limited-sweep",
+    "frames": 24,
+    "model": "calibreAt(progress)",
+    "strategy": {
+      "input": "strategyPosition",
+      "result": "strategyAngle",
+      "unit": "radian",
+      "range": [
+        -2.356194490192345,
+        -0.7853981633974483
+      ]
+    },
+    "analysis": {
+      "input": "analysisPosition",
+      "result": "analysisOutput",
+      "unit": "radian",
+      "ratio": 0.8181818181818182,
+      "range": [
+        0,
+        1.7135959928671598
+      ]
+    }
+  },
+  "audit": {
+    "scope": "True-solid rest geometry and rest depth audit; each atlas frame depth settled at 2px. No dynamic collision proof or torque simulation.",
+    "results": [
+      {
+        "id": "strategy",
+        "solids": 66,
+        "failures": 0
+      },
+      {
+        "id": "analysis",
+        "solids": 74,
+        "failures": 0
+      }
+    ],
+    "invitation": {
+      "solids": 74,
+      "failures": 0,
+      "scope": "Comparator rest solids; overlay is surface ink, not a new solid."
+    }
+  },
+  "invitationKind": "transparent-overlay",
+  "invitationTarget": "analysis",
+  "visualStyle": "combo",
+  "visualScope": "Vector-rendered line treatment of original solids; unchanged geometry, phase and camera."
+}

@@ -1,0 +1,82 @@
+/* Apple Dynamic Type's default size ladder, expressed in rem for browser scaling.
+   48/64 are editorial web extensions, not native Dynamic Type text styles.
+   Font families remain the site's Geist family. Drawing labels retain cqw geometry. */
+:root {
+  --type-caption-2: .6875rem;
+  --type-caption-1: .75rem;
+  --type-footnote: .8125rem;
+  --type-subhead: .9375rem;
+  --type-callout: 1rem;
+  --type-body-size: 1.0625rem;
+  --type-title-3: 1.25rem;
+  --type-title-2: 1.375rem;
+  --type-title-1: 1.75rem;
+  --type-large-title: 2.125rem;
+  --type-display-small: 3rem;
+  --type-display-size: 4rem;
+  --type-section-size: var(--type-large-title);
+  --type-leading-body: 1.5;
+  --type-leading-heading: 1.2;
+  --type-leading-display: 1.1;
+  --type-leading-list: 1.4;
+}
+@media (max-width:1023px) {
+  :root {--type-display-size:3rem;--type-display-small:2.125rem}
+}
+@media (max-width:639px) {
+  :root {--type-display-size:2.125rem;--type-section-size:var(--type-title-1)}
+}
+.replay-site.replay-site {
+  --editorial-display:var(--type-display-size);
+  --editorial-section:var(--type-section-size);
+  --editorial-card:var(--type-title-2);
+  --editorial-body:var(--type-body-size);
+  --editorial-control:var(--type-callout);
+  --editorial-label:var(--type-caption-2);
+  font-size:var(--type-body-size);
+  line-height:var(--type-leading-body);
+  font-optical-sizing:auto;
+}
+html .replay-site.replay-site :is(h1,h2,h3,h4,h5,h6) {
+  line-height:var(--type-leading-heading);
+  text-wrap:balance;
+  letter-spacing:-.02em;
+}
+html .replay-site.replay-site h1 {font-size:var(--type-display-size)}
+html .replay-site.replay-site h2 {font-size:var(--type-section-size)}
+html .replay-site.replay-site h3 {font-size:var(--type-title-2)}
+html .replay-site.replay-site :is(.insights-entry h3,.insights-talk__title) {
+  font-size:var(--type-callout);line-height:var(--type-leading-list);letter-spacing:0;text-wrap:wrap;
+}
+html .replay-site.replay-site .insights-year-heading {
+  font-size:var(--type-footnote);line-height:var(--type-leading-body);letter-spacing:0;
+}
+html .replay-site.replay-site :is(.coin-expertise-panel h3,.clockwork-copy h3,.clockwork-discovery p) {font-size:var(--type-large-title);line-height:var(--type-leading-heading)}
+html .replay-site.replay-site :is(h4,h5,h6) {font-size:var(--type-title-3)}
+html .replay-site.replay-site :is(.hero-title h1,.company-centered-hero h1,.blog-index h1,.detail-article h1,.founder-identity h2) {
+  font-size:var(--type-display-size);line-height:var(--type-leading-display);
+}
+html .replay-site.replay-site .hero-title h1 {font-size:var(--type-display-small)}
+html .replay-site.replay-site :is(.company-value h3,.work-phases__details h3,.blog-featured h3,.contact-editorial__channels h2,.contact-faq button) {
+  font-size:var(--type-title-2);line-height:1.2727;
+}
+html .replay-site.replay-site :is(.landing-footer-column h2,.contact-profile h1) {
+  font-size:var(--type-title-3);line-height:1.2;
+}
+html .replay-site.replay-site #how-we-work-heading {font-size:var(--type-large-title);line-height:var(--type-leading-heading)}
+html .replay-site.replay-site :is(.company-centered-hero__deck,.company-decision-copy,.company-value p,.work-phases__details p,.audience-description,.founder-short-bio,.contact-editorial__lead,.detail-article .reading-copy,.detail-article .reading-copy p,.detail-article .detail-lead,.blog-featured__items p,.blog-archive__row p,.clockwork-summary,.clockwork-tagline,.clockwork-invitation,.contact-faq [role='region']) {
+  font-size:var(--type-body-size);line-height:var(--type-leading-body);letter-spacing:0;text-wrap:pretty;
+}
+html .replay-site.replay-site :is(.contact-message-form,.contact-message-form label,.contact-message-form input,.contact-message-form select,.contact-message-form textarea) {
+  font-size:var(--type-callout);line-height:1.3125;letter-spacing:0;
+}
+html .replay-site.replay-site .contact-message-form {font-size:var(--type-subhead)}
+html .replay-site.replay-site :is(.site-header nav a,.contact-social-links a) {font-size:var(--type-subhead);line-height:1.3333;letter-spacing:0}
+html .replay-site.replay-site :is(.landing-footer-column a,.contact-profile__identity>p,.contact-editorial__channels>div>a,.blog-featured__author,.blog-archive__date) {font-size:var(--type-footnote);line-height:1.3846}
+html .mobile-navigation .mobile-navigation__body nav a {font-size:var(--type-title-1);line-height:1.2143}
+html :is(.contact-booking-dialog,.mobile-navigation) {font-size:var(--type-body-size);line-height:var(--type-leading-body)}
+html .booking-heading h2 {font-size:var(--type-large-title);line-height:1.2059}
+@media(max-width:639px) {
+  html .replay-site.replay-site :is(.hero-title h1,.company-centered-hero h1,.blog-index h1,.detail-article h1,.founder-identity h2) {font-size:var(--type-large-title)}
+  html .replay-site.replay-site :is(.audience-copy h2,.company-values h2,.company-decision-heading h2,.contact-faq h2) {font-size:var(--type-title-1)}
+}

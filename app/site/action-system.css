@@ -1,0 +1,78 @@
+/* Shared roles for page actions, navigation actions and utility controls. */
+:root,.replay-site {
+  --action-ink:#141518;
+  --action-paper:#fcfcfc;
+  --action-blue:#133264;
+  --action-ease:cubic-bezier(.23,1,.32,1);
+  --action-control-size:44px;
+  --action-compact-size:52px;
+  --action-primary-size:64px;
+}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking,.booking-submit) {
+  position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:260px;max-width:100%;min-height:var(--action-primary-size)!important;height:auto!important;
+  padding:12px 24px!important;gap:0!important;
+  border:1px solid var(--action-ink)!important;border-radius:0!important;
+  background:var(--action-ink)!important;color:white!important;
+  box-shadow:none!important;text-decoration:none!important;text-transform:none!important;
+  font:500 var(--type-callout)/var(--type-leading-list) var(--font-serif)!important;letter-spacing:.01em!important;
+  white-space:normal;text-align:center;cursor:pointer;
+  transition:transform 150ms var(--action-ease),color 200ms ease,border-color 200ms ease!important;
+}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking)::before {
+  content:'';position:absolute;z-index:-1;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,#133264 27%,#147dba 144%);
+  opacity:0;transition:opacity 300ms ease;
+}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking)::after {
+  content:'';position:absolute;z-index:-1;inset:0;pointer-events:none;
+  background:url('/assets/company/records/weave.webp') center / 185px 185px;
+  mix-blend-mode:soft-light;
+  box-shadow:inset 0 0 0 1.5px #00000040;
+  opacity:0;transition:opacity 300ms ease;
+}
+@media(hover:hover){
+  :is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking):hover {color:white!important}
+  :is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking):hover::before,
+  :is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking):hover::after {opacity:1}
+}
+@media(prefers-reduced-motion:no-preference) {
+  :is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.action-button,.primary-cta,.header-contact,.hero-booking-link,.clockwork-call,.work-phases__cta,.contact-book-call,.contact-message-form>button,.audience-company-link,.company-centered-hero__button,.founder-writing-primary>a,.founder-booking-secondary,.mobile-navigation__booking):active:not(:disabled,[aria-disabled='true']) {transform:scale(.96)}
+}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(button,a):focus-visible {outline:2px solid #147dba;outline-offset:4px}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(button,[aria-disabled=true]):disabled {opacity:.45;cursor:not-allowed}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) .founder-booking-secondary {background:transparent!important;color:var(--action-ink)!important}
+.replay-site .site-header>.header-contact {width:auto;min-height:var(--action-control-size)!important;padding:8px 20px!important;font-size:var(--type-caption-1)!important;line-height:var(--type-leading-list)!important;flex-shrink:0}
+.replay-site .contact-message-form>button {width:100%}
+.replay-site .action-button.action-button--compact {
+  width: fit-content;
+  min-height: var(--action-control-size) !important;
+  padding: 8px 14px !important;
+  font-size: var(--type-caption-1) !important;
+}
+.replay-site .action-button.action-button--on-dark {
+  background: transparent !important;
+  border-color: #a4b3c6a6 !important;
+  color: var(--action-paper) !important;
+}
+.replay-site .action-button--on-dark:focus-visible {
+  outline-color: var(--action-paper);
+}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.founder-writing-primary,.founder-profile-action) {max-width:100%}
+.replay-site .blog-archive__filters button,
+.replay-site .insight-filters button {border:1px solid transparent;border-radius:0;background:transparent;min-height:40px;padding:8px 12px;font:400 var(--type-caption-1)/1.6667 var(--font-mono);letter-spacing:0;box-shadow:none}
+.replay-site .blog-archive__filters button[aria-pressed=true],
+.replay-site .insight-filters button[aria-pressed=true] {border-color:#a8a8a8;background:#1415180a;color:#141518}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.mobile-menu-trigger,.mobile-navigation__close,.contact-booking-dialog__close) {border-radius:0;box-shadow:none;font-family:var(--font-body)}
+:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(.contact-faq,.replay-faq) button {font-family:var(--font-serif);border-radius:0;box-shadow:none}
+@media(max-width:639px){
+  :root,.replay-site {--action-primary-size:var(--action-compact-size)}
+}
+@media(prefers-reduced-motion:reduce){:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(a,button)::before,:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(a,button)::after,:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(a,button){transition:none!important}:is(.replay-site,.mobile-navigation,.contact-booking-dialog) :is(a,button):active{transform:none}}
+
+.replay-site .analytics-choice button {border:1px solid #141518;border-radius:0;min-height:var(--action-control-size);padding:10px 18px;background:#141518;color:#fff;font:500 var(--type-caption-1)/var(--type-leading-list) var(--font-serif);box-shadow:none}
+.replay-site .analytics-choice button:first-of-type {background:transparent;color:#141518}
+
+@media(hover:hover){.replay-site.site-home .site-header>.header-contact:hover {color:#fff!important}}
+.mobile-navigation .mobile-navigation__booking {width:100%;min-height:var(--action-compact-size)!important}
