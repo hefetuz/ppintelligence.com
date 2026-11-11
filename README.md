@@ -1,9 +1,18 @@
 # Pretty Penny website source
 
-This source artifact builds the current public website from Sanity. It contains approved public snapshots for offline verification and selected runtime assets. It excludes Studio, private source notes, drafts and import seeds.
+Production website: https://prettypennyintelligence.com/
+Content editor: https://prettypenny-content.sanity.studio/
 
-Use Node 22.13+ and pnpm 10. Install with `pnpm install --frozen-lockfile`. Set `CONTENT_MODE=sanity`, `SANITY_PROJECT_ID=p95297ni`, `SANITY_DATASET=production` and run `pnpm run build:preview`. The build queries published CMS documents and fails if the connection or content is invalid. An unpublished record has no local editorial fallback. Never commit a Sanity read token; use a GitHub Actions secret for private datasets.
+## Publishing content
 
-The included GitHub Pages workflow uses repository variables SANITY_PROJECT_ID and SANITY_DATASET, with an optional SANITY_READ_TOKEN secret. Configure the repository Pages source as GitHub Actions. Publish events need an authenticated server-side dispatch bridge or a scheduled build; no secret belongs in Studio/browser code.
+The editor has Writing, Speaking and Podcasts. Drafts stay in Sanity. Use Publish when a record is ready, or Unpublish to remove it from the website. A GitHub Actions schedule checks the published CMS revisions every five minutes. When content changes, it builds and deploys the website. GitHub can delay scheduled jobs, so publishing is not instantaneous.
 
-Studio: https://prettypenny-content.sanity.studio/
+The revision check skips installation and deployment when nothing has changed. Failed CMS reads or invalid published data stop the workflow and keep the last successful website online. No GitHub access token is shared with Sanity. The public production dataset is queried with the published perspective, excluding draft and release-version records.
+
+## Source and configuration
+
+This source artifact contains approved public defaults and selected runtime assets. It excludes private notes, drafts, import seeds, local settings and credentials. Editorial content comes from Sanity and has no local fallback after unpublishing.
+
+Use Node 22.13+ and pnpm 10. Run `pnpm install --frozen-lockfile`, then `pnpm run build:preview` with `CONTENT_MODE=sanity`, `SANITY_PROJECT_ID=p95297ni`, `SANITY_DATASET=production`, `SITE_ORIGIN=https://prettypennyintelligence.com`, `SITE_ENV=production`, and `ENABLE_INDEXING=true`.
+
+The default branch is site-source. GitHub Pages uses the Publish website content workflow. Repository variables configure SANITY_PROJECT_ID, SANITY_DATASET and CMS_DEPLOY_ENABLED. The latter gates deployment until a source validation build has passed. Domain and HTTPS configuration are retained.
