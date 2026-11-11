@@ -4,7 +4,8 @@ on:
   push:
     branches: [site-source]
   schedule:
-    - cron: '3-58/5 * * * *'
+    # Poll published revisions without sharing GitHub credentials with the CMS.
+    - cron: '*/5 * * * *'
   workflow_dispatch:
   repository_dispatch:
     types: [cms-publish]
