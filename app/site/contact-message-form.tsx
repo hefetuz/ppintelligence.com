@@ -24,7 +24,8 @@ export function ContactMessageForm() {
     'idle',
   );
   const [error, setError] = useState('');
-  const [emailDraft, setEmailDraft] = useState(false);
+  // This static site opens an email draft on both custom and GitHub domains.
+  const emailDraft = true;
   const [draftRequested, setDraftRequested] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [token, setToken] = useState('');
@@ -34,7 +35,6 @@ export function ContactMessageForm() {
   const busy = useRef(false);
   const submission = useRef({ fingerprint: '', id: '' });
   useEffect(() => {
-    setEmailDraft(location.hostname.endsWith('.github.io'));
     if (new URLSearchParams(location.search).get('topic') === 'speaking')
       setTopic('Speaking invitation');
   }, []);
