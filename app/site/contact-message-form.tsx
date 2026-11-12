@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { contact } from './content';
 import { ContactSecurity } from './contact-security';
 import { trackEvent } from './analytics';
+import config from '../../.generated/site-config.json';
 
 type RequiredField = HTMLInputElement | HTMLTextAreaElement;
 function fieldError(field: RequiredField) {
@@ -24,8 +25,8 @@ export function ContactMessageForm() {
     'idle',
   );
   const [error, setError] = useState('');
-  // This static site opens an email draft on both custom and GitHub domains.
-  const emailDraft = true;
+  // Keep the working email fallback until both live services are configured.
+  const emailDraft = !(config.contactEndpoint && config.turnstileSiteKey);
   const [draftRequested, setDraftRequested] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [token, setToken] = useState('');
@@ -80,6 +81,11 @@ export function ContactMessageForm() {
           location.href = `mailto:${contact.email}?subject=${encodeURIComponent(String(draft.topic))}&body=${encodeURIComponent(body)}`;
           return;
         }
+        if (!token) {
+          setError('Please complete the security check before sending your message.');
+          setState('error');
+          return;
+        }
         busy.current = true;
         const fields = Object.fromEntries(new FormData(form).entries());
         const fingerprint = JSON.stringify(fields);
@@ -88,8 +94,9 @@ export function ContactMessageForm() {
         setState('sending');
         setError('');
         try {
-          const response = await fetch('/api/contact', {
+          const response = await fetch(config.contactEndpoint, {
             method: 'POST',
+            credentials: 'omit',
             headers: {
               'Content-Type': 'application/json',
               'Idempotency-Key': submission.current.id,

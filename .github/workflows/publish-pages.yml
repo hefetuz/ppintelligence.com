@@ -30,6 +30,8 @@ jobs:
       SITE_ORIGIN: https://prettypennyintelligence.com
       SITE_ENV: production
       ENABLE_INDEXING: 'true'
+      CONTACT_ENDPOINT: ${{ vars.CONTACT_ENDPOINT }}
+      TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4

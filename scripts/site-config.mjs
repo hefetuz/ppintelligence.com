@@ -1,4 +1,11 @@
 export function siteConfiguration(env) {
+  let contactEndpoint = '';
+  if (env.CONTACT_ENDPOINT) {
+    const url = new URL(env.CONTACT_ENDPOINT);
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash)
+      throw new Error('CONTACT_ENDPOINT must be an HTTPS URL without credentials, query or fragment.');
+    contactEndpoint = url.href;
+  }
   let origin = '';
   if (env.SITE_ORIGIN) {
     const url = new URL(env.SITE_ORIGIN);
@@ -25,6 +32,7 @@ export function siteConfiguration(env) {
   return {
     origin,
     indexable,
+    contactEndpoint,
     turnstileSiteKey: env.TURNSTILE_SITE_KEY ?? '',
     googleAnalyticsId: /^G-[A-Z0-9]+$/.test(env.GA_MEASUREMENT_ID ?? '')
       ? env.GA_MEASUREMENT_ID

@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "ppintelligence-contact",
+  "pages_build_output_dir": "./public",
+  "compatibility_date": "2026-11-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "SITE_ORIGIN": "https://prettypennyintelligence.com",
+    "CONTACT_ALLOWED_ORIGINS": "https://prettypennyintelligence.com,https://www.prettypennyintelligence.com",
+    "CONTACT_TO": "dtudor@prettypennyintelligence.com"
+  }
+}

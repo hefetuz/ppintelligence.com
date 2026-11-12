@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ppintelligence-contact",
+  "account_id": "1bd026ec4cb14d93fa20f89dc3e0f4b1",
+  "main": "workers/contact.mjs",
+  "compatibility_date": "2026-11-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vars": {
+    "SITE_ORIGIN": "https://prettypennyintelligence.com",
+    "CONTACT_ALLOWED_ORIGINS": "https://prettypennyintelligence.com,https://www.prettypennyintelligence.com",
+    "CONTACT_TO": "dtudor@prettypennyintelligence.com"
+  },
+  "ratelimits": [{
+    "name": "CONTACT_RATE_LIMITER",
+    "namespace_id": "1794485301",
+    "simple": { "limit": 3, "period": 60 }
+  }]
+}
