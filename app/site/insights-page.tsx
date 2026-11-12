@@ -14,6 +14,7 @@ import {
   type InsightFilters, type SpeakingFormat,
 } from './insights-model';
 import './insights-library.css';
+import { InsightsNewsletter } from './insights-newsletter';
 
 type View = 'writing' | 'speaking' | 'podcasts';
 type EngagementStatus = 'all' | SpeakingRecord['status'];
@@ -110,6 +111,7 @@ export function InsightsPage({ insights = publishedInsights }: { insights?: type
 
   return (
     <PageShell active="/insights/" closing={false}>
+      <InsightsNewsletter />
       <div className="insights-page" data-ascii="skip">
         <h1 className="sr-only">Insights</h1>
         <nav className="insights-views" aria-label="Insights categories">
